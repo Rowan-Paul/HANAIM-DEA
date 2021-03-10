@@ -84,7 +84,6 @@ public class UserServiceTest {
 
         IUserDAO userDAOMock = mock(IUserDAO.class);
         when(userDAOMock.getUser(user.getUser())).thenReturn(returnedUser);
-        when(userDAOMock.createToken(user.getUser())).thenReturn(token);
         userService.setUserDAO(userDAOMock);
 
         // Act
