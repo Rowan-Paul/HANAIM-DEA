@@ -1,14 +1,14 @@
 package com.rowanpaulflynn.service;
 
 import com.rowanpaulflynn.dao.IUserDAO;
+import com.rowanpaulflynn.domain.Token;
 import com.rowanpaulflynn.domain.User;
+import com.rowanpaulflynn.service.dto.TokenDTO;
 import com.rowanpaulflynn.service.dto.UserDTO;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -18,25 +18,36 @@ public class UserService {
     private IUserDAO userDAO;
 
     /**
-     * Obviously a test, never send back a password!
+     * POST /login
      * */
-    @GET
-    @Path("/{id}")
+    @POST
+    @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getDatabase(@PathParam("id") String id) {
-        // Retrieve from database:
-        User user = userDAO.getUser(id);
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response loginUser(UserDTO userDTO) {
+        // Retrieve user from database
+        User user = userDAO.getUser(userDTO.user);
 
-        if (user == null){
-            return Response.status(404).build();
+        if(user == null) {
+            return Response.status(401).build();
         }
 
-        UserDTO userDTO = new UserDTO();
-        userDTO.user = user.getUser();
-        userDTO.password = user.getPassword();
+        // Check stored hashed password with hashed input password
+        if(DigestUtils.sha256Hex(userDTO.password).equals(user.getPassword())) {
+            Token token = userDAO.createToken(userDTO.user);
 
-        return Response.status(200).entity(userDTO).build();
+            if(token == null) {
+                return Response.status(400).build();
+            }
 
+            TokenDTO tokenDTO = new TokenDTO();
+            tokenDTO.token = token.getToken();
+            tokenDTO.user = token.getUser();
+
+            return Response.status(201).entity(tokenDTO).build();
+        } else {
+            return Response.status(401).build();
+        }
     }
 
     @Inject

@@ -1,5 +1,6 @@
 package com.rowanpaulflynn.dao;
 
+import com.rowanpaulflynn.domain.Token;
 import com.rowanpaulflynn.domain.User;
 
 import javax.annotation.Resource;
@@ -17,13 +18,13 @@ public class UserDAO implements IUserDAO {
     DataSource dataSource;
 
     @Override
-    public User getUser(String id) {
+    public User getUser(String inputUser) {
         String sql = "select * from users where user = ?";
 
         try {
             Connection connection = dataSource.getConnection();
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1,id);
+            statement.setString(1,inputUser);
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()){
@@ -33,6 +34,28 @@ public class UserDAO implements IUserDAO {
 
                 return user;
             }
+
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
+
+        return null;
+    }
+
+    @Override
+    public Token createToken(String user) {
+        String sql = "INSERT INTO tokens (`token`, `user`) VALUES (?, ?)";
+
+        try {
+            Token token = new Token(user);
+
+            Connection connection = dataSource.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(2,user);
+            statement.setString(1,token.getToken());
+            int resultSet = statement.executeUpdate();
+
+            return token;
 
         } catch (SQLException exception) {
             exception.printStackTrace();

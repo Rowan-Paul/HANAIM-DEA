@@ -1,7 +1,5 @@
 package com.rowanpaulflynn.domain;
 
-import javax.security.enterprise.credential.Password;
-
 public class User {
     private String user;
     private String password;
