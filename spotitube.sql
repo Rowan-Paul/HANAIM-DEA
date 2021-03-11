@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 11, 2021 at 10:53 AM
+-- Generation Time: Mar 11, 2021 at 11:15 AM
 -- Server version: 10.4.17-MariaDB
 -- PHP Version: 8.0.2
 
@@ -61,6 +61,13 @@ CREATE TABLE IF NOT EXISTS `tokens` (
 --
 
 TRUNCATE TABLE `tokens`;
+--
+-- Dumping data for table `tokens`
+--
+
+INSERT INTO `tokens` (`token`, `user`) VALUES
+('0cd3f990-c297-47a9-a4e2-49d64a500203', 'rowan');
+
 -- --------------------------------------------------------
 
 --
@@ -69,23 +76,29 @@ TRUNCATE TABLE `tokens`;
 
 DROP TABLE IF EXISTS `tracks`;
 CREATE TABLE IF NOT EXISTS `tracks` (
-  `id` int(6) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(50) NOT NULL,
-  `performer` int(200) NOT NULL,
+  `performer` varchar(50) NOT NULL,
   `duration` int(4) NOT NULL,
   `album` varchar(50) NOT NULL,
   `playcount` int(11) NOT NULL,
   `publicationDate` date NOT NULL,
-  `description` varchar(200) NOT NULL,
-  `offlineAvailable` tinyint(1) NOT NULL,
+  `description` varchar(500) NOT NULL,
   PRIMARY KEY (`id`,`title`,`performer`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Truncate table before insert `tracks`
 --
 
 TRUNCATE TABLE `tracks`;
+--
+-- Dumping data for table `tracks`
+--
+
+INSERT INTO `tracks` (`id`, `title`, `performer`, `duration`, `album`, `playcount`, `publicationDate`, `description`) VALUES
+(1, 'the 1', 'Taylor Swift', 222, 'Folklore', 0, '2020-07-24', '\"The 1\" (stylized in all lowercase) is a song recorded by American singer-songwriter Taylor Swift, for her eighth studio album, Folklore (2020), which was released on July 24, 2020, through Republic Records. The song was promoted to German contemporary hit radio on October 9, 2020, as the album\'s fourth single. As the opening track of the album, the song was written by Swift and Aaron Dessner, with production from the latter.\r\n\r\n');
+
 -- --------------------------------------------------------
 
 --
