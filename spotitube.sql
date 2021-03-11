@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 10, 2021 at 11:16 AM
+-- Generation Time: Mar 11, 2021 at 10:53 AM
 -- Server version: 10.4.17-MariaDB
 -- PHP Version: 8.0.2
 
@@ -26,6 +26,26 @@ USE `spotitube`;
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `playlists`
+--
+
+DROP TABLE IF EXISTS `playlists`;
+CREATE TABLE IF NOT EXISTS `playlists` (
+  `id` int(6) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
+  `owner` varchar(50) NOT NULL,
+  `tracks` varchar(10000) NOT NULL,
+  PRIMARY KEY (`id`,`name`,`owner`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Truncate table before insert `playlists`
+--
+
+TRUNCATE TABLE `playlists`;
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `tokens`
 --
 
@@ -41,6 +61,31 @@ CREATE TABLE IF NOT EXISTS `tokens` (
 --
 
 TRUNCATE TABLE `tokens`;
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tracks`
+--
+
+DROP TABLE IF EXISTS `tracks`;
+CREATE TABLE IF NOT EXISTS `tracks` (
+  `id` int(6) NOT NULL AUTO_INCREMENT,
+  `title` varchar(50) NOT NULL,
+  `performer` int(200) NOT NULL,
+  `duration` int(4) NOT NULL,
+  `album` varchar(50) NOT NULL,
+  `playcount` int(11) NOT NULL,
+  `publicationDate` date NOT NULL,
+  `description` varchar(200) NOT NULL,
+  `offlineAvailable` tinyint(1) NOT NULL,
+  PRIMARY KEY (`id`,`title`,`performer`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Truncate table before insert `tracks`
+--
+
+TRUNCATE TABLE `tracks`;
 -- --------------------------------------------------------
 
 --
@@ -64,10 +109,7 @@ TRUNCATE TABLE `users`;
 --
 
 INSERT INTO `users` (`user`, `password`) VALUES
-('alex', 'ditisalex'),
-('patrick', 'stolenbows'),
-('rowan', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8'),
-('sjaak', 'ikbendesjaak');
+('rowan', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8');
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
