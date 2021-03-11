@@ -48,8 +48,8 @@ public class UserDAO implements IUserDAO {
             Token token = new Token(user);
 
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(2,user);
             statement.setString(1,token.getToken());
+            statement.setString(2,user);
             int resultSet = statement.executeUpdate();
 
             return token;
