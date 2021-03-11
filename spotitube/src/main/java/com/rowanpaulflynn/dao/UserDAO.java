@@ -11,7 +11,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-
 @Default
 public class UserDAO implements IUserDAO {
     @Resource(name="jdbc/spotitube")
@@ -21,8 +20,7 @@ public class UserDAO implements IUserDAO {
     public User getUser(String inputUser) {
         String sql = "select * from users where user = ?";
 
-        try {
-            Connection connection = dataSource.getConnection();
+        try(Connection connection = dataSource.getConnection();) {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1,inputUser);
             ResultSet resultSet = statement.executeQuery();
@@ -46,10 +44,9 @@ public class UserDAO implements IUserDAO {
     public Token createToken(String user) {
         String sql = "INSERT INTO tokens (`token`, `user`) VALUES (?, ?)";
 
-        try {
+        try(Connection connection = dataSource.getConnection();) {
             Token token = new Token(user);
 
-            Connection connection = dataSource.getConnection();
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(2,user);
             statement.setString(1,token.getToken());
