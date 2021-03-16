@@ -3,6 +3,7 @@ package com.rowanpaulflynn.service;
 import com.rowanpaulflynn.dao.IPlaylistDAO;
 import com.rowanpaulflynn.dao.IUserDAO;
 import com.rowanpaulflynn.domain.Playlist;
+import com.rowanpaulflynn.domain.Track;
 import com.rowanpaulflynn.domain.User;
 import com.rowanpaulflynn.service.dto.PlaylistDTO;
 import com.rowanpaulflynn.service.dto.TrackDTO;
@@ -120,6 +121,22 @@ public class PlaylistService {
         if (playlistDAO.addTrackToPlaylist(playlistid, trackDTO.id)) {
             //TODO: return tracks from playlist
             return Response.status(201).build();
+        }
+
+        return Response.status(400).build();
+    }
+
+    @GET
+    @Path("/{id}/tracks")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getTracks(@QueryParam("token") String token, @PathParam("id") int playlistid) {
+        User user = userDAO.verifyToken(token);
+
+        ArrayList<Track> tracks = playlistDAO.getTracksFromPlaylist(playlistid);
+
+        if(tracks.size() > 0) {
+            return Response.status(200).entity(tracks).build();
         }
 
         return Response.status(400).build();
