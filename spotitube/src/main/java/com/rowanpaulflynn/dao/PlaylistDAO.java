@@ -95,13 +95,14 @@ public class PlaylistDAO implements IPlaylistDAO {
 
     @Override
     public Boolean deletePlaylist(int playlistid) {
-        //TODO: also remove playlist from playlisttracks
         String sql = "delete from playlists where id = ?";
 
         try(Connection connection = dataSource.getConnection();) {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1,playlistid);
             int resultSet = statement.executeUpdate();
+
+            deleteTracksInPLaylist(playlistid);
 
             return true;
 
@@ -112,7 +113,6 @@ public class PlaylistDAO implements IPlaylistDAO {
         return false;
     }
 
-    //TODO: add length to playlists
     @Override
     public Boolean createPlaylist(PlaylistDTO playlistDTO, String owner) {
         String sql = "insert into playlists (`name`, `owner`) values (?, ?)";
@@ -169,6 +169,51 @@ public class PlaylistDAO implements IPlaylistDAO {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1,playlistid);
             statement.setInt(2,trackid);
+            int resultSet = statement.executeUpdate();
+
+            return true;
+
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
+
+        return false;
+    }
+
+    @Override
+    public Boolean editPlaylist(int playlistid, PlaylistDTO playlistDTO) {
+        String sql = "update playlists set name = ? where id = ?";
+
+        try(Connection connection = dataSource.getConnection();) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1,playlistDTO.name);
+            statement.setInt(2,playlistid);
+            int resultSet = statement.executeUpdate();
+
+            for (Object track : playlistDTO.tracks) {
+                HashMap tk = (HashMap) track;
+                Number trackid = (Number) tk.get("id");
+
+                deleteTracksInPLaylist(playlistid);
+                addTrackToPlaylist(playlistid, trackid.intValue());
+            }
+
+            return true;
+
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
+
+        return false;
+    }
+
+    @Override
+    public Boolean deleteTracksInPLaylist(int playlistid) {
+        String sql = "delete from playlisttracks where playlistid = ?";
+
+        try(Connection connection = dataSource.getConnection();) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1,playlistid);
             int resultSet = statement.executeUpdate();
 
             return true;

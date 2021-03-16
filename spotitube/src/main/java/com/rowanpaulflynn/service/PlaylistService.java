@@ -81,6 +81,20 @@ public class PlaylistService {
         return Response.status(400).build();
     }
 
+    @PUT
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response createPlaylist(@PathParam("id") int playlistid, PlaylistDTO newPlaylistDTO, @QueryParam("token") String token) {
+        User user = userDAO.verifyToken(token);
+
+        if (playlistDAO.editPlaylist(playlistid, newPlaylistDTO)) {
+            return getAllPlaylists(token);
+        }
+
+        return Response.status(400).build();
+    }
+
     @Inject
     public void setPlaylistDAO(IPlaylistDAO playlistDAO) {
         this.playlistDAO = playlistDAO;
