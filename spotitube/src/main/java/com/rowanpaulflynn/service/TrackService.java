@@ -36,7 +36,7 @@ public class TrackService {
 
             allTracks.forEach((track) -> {
                 inPlaylist.forEach((playlistTrack) -> {
-                    if (playlistTrack.getId() == track.getId()) {
+                    if (playlistTrack.getId() != track.getId()) {
                         tracks.add(playlistDAO.getTrackInfo(track.getId()));
                     }
                 });
