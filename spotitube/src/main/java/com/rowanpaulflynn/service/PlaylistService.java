@@ -5,7 +5,7 @@ import com.rowanpaulflynn.dao.IUserDAO;
 import com.rowanpaulflynn.domain.Playlist;
 import com.rowanpaulflynn.domain.User;
 import com.rowanpaulflynn.service.dto.PlaylistDTO;
-import com.rowanpaulflynn.service.dto.UserDTO;
+import com.rowanpaulflynn.service.dto.TrackDTO;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -53,20 +53,6 @@ public class PlaylistService {
         return Response.status(200).entity(playlistsDTO).build();
     }
 
-    @DELETE
-    @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response deletePlaylist(@PathParam("id") int playlistid, @QueryParam("token") String token) {
-        User user = userDAO.verifyToken(token);
-
-        if (playlistDAO.deletePlaylist(playlistid)) {
-            return getAllPlaylists(token);
-        } else {
-            return Response.status(400).build();
-        }
-    }
-
     @POST
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
@@ -90,6 +76,50 @@ public class PlaylistService {
 
         if (playlistDAO.editPlaylist(playlistid, newPlaylistDTO)) {
             return getAllPlaylists(token);
+        }
+
+        return Response.status(400).build();
+    }
+
+    @DELETE
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response deletePlaylist(@PathParam("id") int playlistid, @QueryParam("token") String token) {
+        User user = userDAO.verifyToken(token);
+
+        if (playlistDAO.deletePlaylist(playlistid)) {
+            return getAllPlaylists(token);
+        } else {
+            return Response.status(400).build();
+        }
+    }
+
+    @DELETE
+    @Path("/{playlistid}/tracks/{trackid}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response deleteTrackInPlaylist(@PathParam("playlistid") int playlistid, @PathParam("trackid") int trackid, @QueryParam("token") String token) {
+        User user = userDAO.verifyToken(token);
+
+        if (playlistDAO.deleteTrackInPLaylist(playlistid, trackid)) {
+            //TODO: return tracks from playlist
+            return Response.status(200).build();
+        }
+
+        return Response.status(400).build();
+    }
+
+    @POST
+    @Path("/{playlistid}/tracks")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response createPlaylist(@PathParam("playlistid") int playlistid, @QueryParam("token") String token, TrackDTO trackDTO) {
+        User user = userDAO.verifyToken(token);
+
+        if (playlistDAO.addTrackToPlaylist(playlistid, trackDTO.id)) {
+            //TODO: return tracks from playlist
+            return Response.status(201).build();
         }
 
         return Response.status(400).build();

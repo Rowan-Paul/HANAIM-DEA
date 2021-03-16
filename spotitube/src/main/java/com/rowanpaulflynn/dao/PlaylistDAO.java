@@ -225,6 +225,25 @@ public class PlaylistDAO implements IPlaylistDAO {
         return false;
     }
 
+    @Override
+    public Boolean deleteTrackInPLaylist(int playlistid, int trackid) {
+        String sql = "delete from playlisttracks where playlistid = ? and trackid = ?";
+
+        try(Connection connection = dataSource.getConnection();) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1,playlistid);
+            statement.setInt(2,trackid);
+            int resultSet = statement.executeUpdate();
+
+            return true;
+
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
+
+        return false;
+    }
+
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
     }
