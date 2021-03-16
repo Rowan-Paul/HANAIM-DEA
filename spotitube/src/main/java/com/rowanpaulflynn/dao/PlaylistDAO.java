@@ -2,13 +2,11 @@ package com.rowanpaulflynn.dao;
 
 import com.rowanpaulflynn.domain.Playlist;
 import com.rowanpaulflynn.domain.Track;
-import com.rowanpaulflynn.domain.User;
 import com.rowanpaulflynn.service.dto.PlaylistDTO;
 
 import javax.annotation.Resource;
 import javax.enterprise.inject.Default;
 import javax.sql.DataSource;
-import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -61,7 +59,7 @@ public class PlaylistDAO implements IPlaylistDAO {
             ArrayList<Track> tracks = new ArrayList<>();
 
             while (resultSet.next()){
-                tracks.add(getTrackInfo(resultSet.getInt("track")));
+                tracks.add(getTrackInfo(resultSet.getInt("trackid")));
             }
 
             return tracks;
