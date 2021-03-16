@@ -42,7 +42,7 @@ public class UserDAO implements IUserDAO {
 
     @Override
     public Token createToken(String user) {
-        String sql = "INSERT INTO tokens (`token`, `user`) VALUES (?, ?)";
+        String sql = "insert into tokens (`token`, `user`) values (?, ?)";
 
         try(Connection connection = dataSource.getConnection();) {
             Token token = new Token(user);
@@ -59,6 +59,28 @@ public class UserDAO implements IUserDAO {
         }
 
         return null;
+    }
+
+    @Override
+    public User verifyToken(String token) {
+        String sql = "select * from tokens where token = ?";
+
+        try(Connection connection = dataSource.getConnection();) {
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1,token);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()){
+                User user = new User(resultSet.getString("user"));
+
+                return user;
+            }
+
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
+
+        return new User("null");
     }
 
     public void setDataSource(DataSource dataSource) {

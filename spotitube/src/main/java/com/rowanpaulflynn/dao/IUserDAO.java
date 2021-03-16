@@ -7,4 +7,6 @@ public interface IUserDAO {
     User getUser(String user);
 
     Token createToken(String user);
+
+    User verifyToken(String token);
 }

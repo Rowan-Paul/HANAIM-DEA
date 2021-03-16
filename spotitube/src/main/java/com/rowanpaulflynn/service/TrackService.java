@@ -13,7 +13,7 @@ import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 
 //TODO: Only return tracks that aren't in
-//TODO: the playlist already
+//      the playlist already
 @Path("/tracks")
 public class TrackService {
 
@@ -32,6 +32,7 @@ public class TrackService {
 
         TracksListDTO tracksListDTO = new TracksListDTO();
         tracksListDTO.tracks = tracks;
+
 
         return Response.status(200).entity(tracksListDTO).build();
     }

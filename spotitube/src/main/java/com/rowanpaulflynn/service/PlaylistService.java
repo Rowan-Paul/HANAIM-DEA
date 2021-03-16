@@ -1,0 +1,141 @@
+package com.rowanpaulflynn.service;
+
+import com.rowanpaulflynn.dao.IPlaylistDAO;
+import com.rowanpaulflynn.dao.IUserDAO;
+import com.rowanpaulflynn.domain.Playlist;
+import com.rowanpaulflynn.domain.User;
+import com.rowanpaulflynn.service.dto.PlaylistDTO;
+import com.rowanpaulflynn.service.dto.UserDTO;
+
+import javax.inject.Inject;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.ArrayList;
+
+@Path("/playlists")
+public class PlaylistService {
+    private IPlaylistDAO playlistDAO;
+    private IUserDAO userDAO;
+
+    @GET
+    @Path("/")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getAllPlaylists(@QueryParam("token") String token) {
+        User user = userDAO.verifyToken(token);
+
+        ArrayList playlists = playlistDAO.getPlaylists();
+
+        if (playlists.size() < 1) {
+            return Response.status(404).build();
+        }
+
+        ArrayList<PlaylistDTO> playlistsDTO = new ArrayList<>();
+
+        playlists.forEach((playlist) -> {
+            Playlist pl = (Playlist) playlist;
+
+            PlaylistDTO playlistDTO = new PlaylistDTO();
+            playlistDTO.id = pl.getId();
+            playlistDTO.name = pl.getName();
+            playlistDTO.tracks = pl.getTracks();
+
+            if (pl.getOwner().equals(user.getUser())) {
+                playlistDTO.owner = true;
+            } else {
+                playlistDTO.owner = false;
+            }
+
+            playlistsDTO.add(playlistDTO);
+        });
+
+        return Response.status(200).entity(playlistsDTO).build();
+    }
+
+    @DELETE
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response deletePlaylist(@PathParam("id") int playlistid, @QueryParam("token") String token) {
+        User user = userDAO.verifyToken(token);
+
+        if (playlistDAO.deletePlaylist(playlistid)) {
+            ArrayList playlists = playlistDAO.getPlaylists();
+            if (playlists.size() < 1) {
+                return Response.status(404).build();
+            }
+
+            ArrayList<PlaylistDTO> playlistsDTO = new ArrayList<>();
+
+            playlists.forEach((playlist) -> {
+                Playlist pl = (Playlist) playlist;
+
+                PlaylistDTO playlistDTO = new PlaylistDTO();
+                playlistDTO.id = pl.getId();
+                playlistDTO.name = pl.getName();
+                playlistDTO.tracks = pl.getTracks();
+
+                if (pl.getOwner().equals(user.getUser())) {
+                    playlistDTO.owner = true;
+                } else {
+                    playlistDTO.owner = false;
+                }
+
+                playlistsDTO.add(playlistDTO);
+            });
+
+            return Response.status(200).entity(playlistsDTO).build();
+        } else {
+            return Response.status(400).build();
+        }
+    }
+
+    @POST
+    @Path("/")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response createPlaylist(PlaylistDTO newPlaylistDTO, @QueryParam("token") String token) {
+        User user = userDAO.verifyToken(token);
+
+        if (playlistDAO.createPlaylist(newPlaylistDTO, user.getUser())) {
+            ArrayList playlists = playlistDAO.getPlaylists();
+            if (playlists.size() < 1) {
+                return Response.status(404).build();
+            }
+
+            ArrayList<PlaylistDTO> playlistsDTO = new ArrayList<>();
+
+            playlists.forEach((playlist) -> {
+                Playlist pl = (Playlist) playlist;
+
+                PlaylistDTO playlistDTO = new PlaylistDTO();
+                playlistDTO.id = pl.getId();
+                playlistDTO.name = pl.getName();
+                playlistDTO.tracks = pl.getTracks();
+
+                if (pl.getOwner().equals(user.getUser())) {
+                    playlistDTO.owner = true;
+                } else {
+                    playlistDTO.owner = false;
+                }
+
+                playlistsDTO.add(playlistDTO);
+            });
+
+            return Response.status(200).entity(playlistsDTO).build();
+        }
+
+        return Response.status(400).build();
+    }
+
+    @Inject
+    public void setPlaylistDAO(IPlaylistDAO playlistDAO) {
+        this.playlistDAO = playlistDAO;
+    }
+
+    @Inject
+    public void setUserDAO(IUserDAO userDAO) {
+        this.userDAO = userDAO;
+    }
+}
