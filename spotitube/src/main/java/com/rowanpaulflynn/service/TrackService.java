@@ -12,8 +12,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 
-//TODO: Only return tracks that aren't in
-//      the playlist already
 @Path("/tracks")
 public class TrackService {
 

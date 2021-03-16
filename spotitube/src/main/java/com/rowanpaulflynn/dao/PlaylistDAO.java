@@ -14,12 +14,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+//TODO: move certain track related functions to TrackDAO
+//TODO: implement length of playlist
 @Default
 public class PlaylistDAO implements IPlaylistDAO {
     @Resource(name="jdbc/spotitube")
     DataSource dataSource;
 
-    //TODO: implement length of playlist
     @Override
     public ArrayList<Playlist> getPlaylists() {
         String sql = "select * from playlists";

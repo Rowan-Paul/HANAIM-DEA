@@ -14,6 +14,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 
+//TODO: check status codes
 @Path("/playlists")
 public class PlaylistService {
     private IPlaylistDAO playlistDAO;
@@ -104,8 +105,10 @@ public class PlaylistService {
         User user = userDAO.verifyToken(token);
 
         if (playlistDAO.deleteTrackInPLaylist(playlistid, trackid)) {
-            //TODO: return tracks from playlist
-            return Response.status(200).build();
+            ArrayList<Track> tracks = playlistDAO.getTracksFromPlaylist(playlistid);
+
+            //TODO: deleting last track giving 400
+            return Response.status(200).entity(tracks).build();
         }
 
         return Response.status(400).build();
@@ -119,8 +122,9 @@ public class PlaylistService {
         User user = userDAO.verifyToken(token);
 
         if (playlistDAO.addTrackToPlaylist(playlistid, trackDTO.id)) {
-            //TODO: return tracks from playlist
-            return Response.status(201).build();
+            ArrayList<Track> tracks = playlistDAO.getTracksFromPlaylist(playlistid);
+
+            return Response.status(201).entity(tracks).build();
         }
 
         return Response.status(400).build();
@@ -135,11 +139,11 @@ public class PlaylistService {
 
         ArrayList<Track> tracks = playlistDAO.getTracksFromPlaylist(playlistid);
 
-        if(tracks.size() > 0) {
+        if (tracks.size() > 0) {
             return Response.status(200).entity(tracks).build();
         }
 
-        return Response.status(400).build();
+        return Response.status(404).build();
     }
 
     @Inject
