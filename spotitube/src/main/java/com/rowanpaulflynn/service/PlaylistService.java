@@ -61,31 +61,7 @@ public class PlaylistService {
         User user = userDAO.verifyToken(token);
 
         if (playlistDAO.deletePlaylist(playlistid)) {
-            ArrayList playlists = playlistDAO.getPlaylists();
-            if (playlists.size() < 1) {
-                return Response.status(404).build();
-            }
-
-            ArrayList<PlaylistDTO> playlistsDTO = new ArrayList<>();
-
-            playlists.forEach((playlist) -> {
-                Playlist pl = (Playlist) playlist;
-
-                PlaylistDTO playlistDTO = new PlaylistDTO();
-                playlistDTO.id = pl.getId();
-                playlistDTO.name = pl.getName();
-                playlistDTO.tracks = pl.getTracks();
-
-                if (pl.getOwner().equals(user.getUser())) {
-                    playlistDTO.owner = true;
-                } else {
-                    playlistDTO.owner = false;
-                }
-
-                playlistsDTO.add(playlistDTO);
-            });
-
-            return Response.status(200).entity(playlistsDTO).build();
+            return getAllPlaylists(token);
         } else {
             return Response.status(400).build();
         }
@@ -99,31 +75,7 @@ public class PlaylistService {
         User user = userDAO.verifyToken(token);
 
         if (playlistDAO.createPlaylist(newPlaylistDTO, user.getUser())) {
-            ArrayList playlists = playlistDAO.getPlaylists();
-            if (playlists.size() < 1) {
-                return Response.status(404).build();
-            }
-
-            ArrayList<PlaylistDTO> playlistsDTO = new ArrayList<>();
-
-            playlists.forEach((playlist) -> {
-                Playlist pl = (Playlist) playlist;
-
-                PlaylistDTO playlistDTO = new PlaylistDTO();
-                playlistDTO.id = pl.getId();
-                playlistDTO.name = pl.getName();
-                playlistDTO.tracks = pl.getTracks();
-
-                if (pl.getOwner().equals(user.getUser())) {
-                    playlistDTO.owner = true;
-                } else {
-                    playlistDTO.owner = false;
-                }
-
-                playlistsDTO.add(playlistDTO);
-            });
-
-            return Response.status(200).entity(playlistsDTO).build();
+            return getAllPlaylists(token);
         }
 
         return Response.status(400).build();
