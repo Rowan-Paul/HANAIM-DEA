@@ -8,6 +8,7 @@ import com.rowanpaulflynn.domain.User;
 import com.rowanpaulflynn.service.dto.PlaylistDTO;
 import com.rowanpaulflynn.service.dto.PlaylistsDTO;
 import com.rowanpaulflynn.service.dto.TrackDTO;
+import com.rowanpaulflynn.service.dto.TracklistDTO;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -28,12 +29,11 @@ public class PlaylistService {
     public Response getAllPlaylists(@QueryParam("token") String token) {
         User user = userDAO.verifyToken(token);
 
+        return Response.status(200).entity(getAllPlaylistsList(user)).build();
+    }
+
+    public PlaylistsDTO getAllPlaylistsList(User user) {
         ArrayList playlists = playlistDAO.getPlaylists();
-
-        if (playlists.size() < 1) {
-            return Response.status(404).build();
-        }
-
         PlaylistsDTO playlistsDTO = new PlaylistsDTO();
         playlistsDTO.playlists = new ArrayList<>();
         playlistsDTO.length = 69;
@@ -56,7 +56,7 @@ public class PlaylistService {
             playlistsDTO.playlists.add(playlistDTO);
         });
 
-        return Response.status(200).entity(playlistsDTO).build();
+        return playlistsDTO;
     }
 
     @POST
@@ -67,7 +67,7 @@ public class PlaylistService {
         User user = userDAO.verifyToken(token);
 
         if (playlistDAO.createPlaylist(newPlaylistDTO, user.getUser())) {
-            return getAllPlaylists(token);
+            return Response.status(201).entity(getAllPlaylistsList(user)).build();
         }
 
         return Response.status(400).build();
@@ -81,7 +81,7 @@ public class PlaylistService {
         User user = userDAO.verifyToken(token);
 
         if (playlistDAO.editPlaylist(playlistid, newPlaylistDTO)) {
-            return getAllPlaylists(token);
+            return Response.status(200).entity(getAllPlaylistsList(user)).build();
         }
 
         return Response.status(400).build();
@@ -95,7 +95,7 @@ public class PlaylistService {
         User user = userDAO.verifyToken(token);
 
         if (playlistDAO.deletePlaylist(playlistid)) {
-            return getAllPlaylists(token);
+            return Response.status(200).entity(getAllPlaylistsList(user)).build();
         } else {
             return Response.status(400).build();
         }
@@ -111,7 +111,7 @@ public class PlaylistService {
         if (playlistDAO.deleteTrackInPLaylist(playlistid, trackid)) {
             ArrayList<Track> tracks = playlistDAO.getTracksFromPlaylist(playlistid);
 
-            //TODO: deleting last track giving 400
+            //TODO: fix deleting last track giving 400
             return Response.status(200).entity(tracks).build();
         }
 
@@ -141,10 +141,11 @@ public class PlaylistService {
     public Response getTracks(@QueryParam("token") String token, @PathParam("id") int playlistid) {
         User user = userDAO.verifyToken(token);
 
-        ArrayList<Track> tracks = playlistDAO.getTracksFromPlaylist(playlistid);
+        TracklistDTO tracklistDTO = new TracklistDTO();
+        tracklistDTO.tracks = playlistDAO.getTracksFromPlaylist(playlistid);
 
-        if (tracks.size() > 0) {
-            return Response.status(200).entity(tracks).build();
+        if (tracklistDTO.tracks.size() > 0) {
+            return Response.status(200).entity(tracklistDTO).build();
         }
 
         return Response.status(404).build();

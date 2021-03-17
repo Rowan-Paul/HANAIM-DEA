@@ -31,6 +31,12 @@ public class TrackDAO implements ITrackDAO {
                 Track track = new Track(resultSet.getInt("id"),
                         resultSet.getString("title"),
                         resultSet.getString("performer"));
+                track.setAlbum(resultSet.getString("album"));
+                track.setDuration(resultSet.getInt("duration"));
+                track.setPlaycount(resultSet.getInt("playcount"));
+                track.setPublicationDate(resultSet.getString("publicationdate"));
+                track.setDescription(resultSet.getString("description"));
+                track.setOfflineAvailable(false);
 
                 tracks.add(track);
             }

@@ -4,10 +4,10 @@ public class TrackDTO {
     public int id;
     public String title;
     public String performer;
-    public String duration;
+    public int duration;
     public String album;
-    public String playcount;
+    public int playcount;
     public String publicationDate;
     public String description;
-    public String offlineAvailable;
+    public boolean offlineAvailable;
 }

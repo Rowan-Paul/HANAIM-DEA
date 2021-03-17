@@ -4,12 +4,12 @@ public class Track {
     private int id;
     private String title;
     private String performer;
-    private String duration;
+    private int duration;
     private String album;
-    private String playcount;
+    private int playcount;
     private String publicationDate;
     private String description;
-    private String offlineAvailable;
+    private Boolean offlineAvailable;
 
     public Track(int id, String title, String performer) {
         this.id = id;
@@ -41,11 +41,11 @@ public class Track {
         this.performer = performer;
     }
 
-    public String getDuration() {
+    public int getDuration() {
         return duration;
     }
 
-    public void setDuration(String duration) {
+    public void setDuration(int duration) {
         this.duration = duration;
     }
 
@@ -57,11 +57,11 @@ public class Track {
         this.album = album;
     }
 
-    public String getPlaycount() {
+    public int getPlaycount() {
         return playcount;
     }
 
-    public void setPlaycount(String playcount) {
+    public void setPlaycount(int playcount) {
         this.playcount = playcount;
     }
 
@@ -81,11 +81,11 @@ public class Track {
         this.description = description;
     }
 
-    public String getOfflineAvailable() {
+    public Boolean getOfflineAvailable() {
         return offlineAvailable;
     }
 
-    public void setOfflineAvailable(String offlineAvailable) {
+    public void setOfflineAvailable(boolean offlineAvailable) {
         this.offlineAvailable = offlineAvailable;
     }
 }
