@@ -67,10 +67,10 @@ public class PlaylistService {
         User user = userDAO.verifyToken(token);
 
         if (playlistDAO.createPlaylist(newPlaylistDTO, user.getUser())) {
-            return Response.status(201).entity(getAllPlaylistsList(user)).build();
+            return Response.status(200).entity(getAllPlaylistsList(user)).build();
         }
 
-        return Response.status(400).build();
+        return Response.status(404).build();
     }
 
     @PUT

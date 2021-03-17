@@ -131,7 +131,7 @@ public class PlaylistDAO implements IPlaylistDAO {
             statement.setString(2, owner);
             int resultSet = statement.executeUpdate();
 
-            if (playlistDTO.tracks.size() > 0) {
+            if (playlistDTO.tracks != null) {
                 int playlistId = getPlaylistIdFromName(playlistDTO.name);
 
                 for (Object trackDTO : playlistDTO.tracks) {
