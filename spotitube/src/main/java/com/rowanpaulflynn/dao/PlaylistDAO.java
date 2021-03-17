@@ -199,12 +199,12 @@ public class PlaylistDAO implements IPlaylistDAO {
             statement.setString(1, playlistDTO.name);
             statement.setInt(2, playlistid);
             int resultSet = statement.executeUpdate();
-
+            
+            deleteTracksInPLaylist(playlistid);
             for (Object track : playlistDTO.tracks) {
                 HashMap tk = (HashMap) track;
                 Number trackid = (Number) tk.get("id");
 
-                deleteTracksInPLaylist(playlistid);
                 addTrackToPlaylist(playlistid, trackid.intValue());
             }
 
