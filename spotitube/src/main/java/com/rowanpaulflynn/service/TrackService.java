@@ -5,6 +5,7 @@ import com.rowanpaulflynn.dao.ITrackDAO;
 import com.rowanpaulflynn.dao.IUserDAO;
 import com.rowanpaulflynn.domain.Track;
 import com.rowanpaulflynn.domain.User;
+import com.rowanpaulflynn.service.dto.TracklistDTO;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -39,7 +40,10 @@ public class TrackService {
                     }
                 });
             });
-            return Response.status(200).entity(tracks).build();
+
+            TracklistDTO tracklistDTO = new TracklistDTO();
+            tracklistDTO.tracks = tracks;
+            return Response.status(200).entity(tracklistDTO).build();
         } else {
             return Response.status(200).entity(allTracks).build();
         }
