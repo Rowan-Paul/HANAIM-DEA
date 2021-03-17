@@ -46,7 +46,7 @@ public class UserDAOTest {
 
             assertEquals(username, user.getUser());
         } catch (Exception e) {
-            fail();
+            fail(e);
             e.getMessage();
         }
     }
@@ -70,7 +70,7 @@ public class UserDAOTest {
                     }
             );
         } catch (Exception e) {
-            fail();
+            fail(e);
             e.getMessage();
         }
     }
@@ -100,7 +100,7 @@ public class UserDAOTest {
 
             assertEquals(username, token.getUser());
         } catch (Exception e) {
-            fail();
+            fail(e);
             e.getMessage();
         }
     }
@@ -132,7 +132,7 @@ public class UserDAOTest {
 
             assertEquals(username, user.getUser());
         } catch (Exception e) {
-            fail();
+            fail(e);
             e.getMessage();
         }
     }

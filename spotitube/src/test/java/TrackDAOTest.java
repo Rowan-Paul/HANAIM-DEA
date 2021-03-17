@@ -53,7 +53,7 @@ public class TrackDAOTest {
             assertEquals(expectedTitle, tracks.get(0).getTitle());
             assertEquals(expectedPerformer, tracks.get(0).getPerformer());
         } catch (Exception e) {
-            fail();
+            fail(e);
             e.getMessage();
         }
     }

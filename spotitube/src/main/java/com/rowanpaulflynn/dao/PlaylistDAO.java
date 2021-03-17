@@ -50,14 +50,24 @@ public class PlaylistDAO implements IPlaylistDAO {
         return null;
     }
 
+    public int calculatePlaylistLength(ArrayList<Track> tracks) {
+        int length = 0;
+
+        for (Track track : tracks) {
+            length += track.getDuration();
+        }
+
+        return length;
+    }
+
     @Override
     public ArrayList<Track> getTracksFromPlaylist(int playlistid) {
         String sql = "select * from playlisttracks where playlistid = ?";
 
         try (Connection connection = dataSource.getConnection();) {
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setInt(1, playlistid);
-            ResultSet resultSet = statement.executeQuery();
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, playlistid);
+            ResultSet resultSet = preparedStatement.executeQuery();
 
             ArrayList<Track> tracks = new ArrayList<>();
 
@@ -73,15 +83,6 @@ public class PlaylistDAO implements IPlaylistDAO {
         return null;
     }
 
-    public int calculatePlaylistLength(ArrayList<Track> tracks) {
-        int length = 0;
-
-        for (Track track : tracks) {
-            length += track.getDuration();
-        }
-
-        return length;
-    }
 
 
     @Override
