@@ -22,14 +22,14 @@ public class UserService {
 
     private IUserDAO userDAO;
 
-    /**
-     * POST /login
-     * */
     @POST
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response loginUser(UserDTO userDTO) {
+        if(userDTO == null) {
+            return Response.status(400).build();
+        }
         // Retrieve user from database
         User user = userDAO.getUser(userDTO.user);
 

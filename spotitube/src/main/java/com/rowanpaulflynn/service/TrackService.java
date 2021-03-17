@@ -25,7 +25,13 @@ public class TrackService {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getTracks(@QueryParam("token") String token, @QueryParam("forPlaylist") int playlistid) {
+        if (token == null || playlistid < 1) {
+            return Response.status(400).build();
+        }
         User user = userDAO.verifyToken(token);
+        if (user == null) {
+            return Response.status(401).build();
+        }
 
         ArrayList<Track> inPlaylist = playlistDAO.getTracksFromPlaylist(playlistid);
         ArrayList<Track> allTracks = trackDAO.getTracks();

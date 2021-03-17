@@ -27,7 +27,14 @@ public class PlaylistService {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getAllPlaylists(@QueryParam("token") String token) {
+        if(token == null) {
+            return Response.status(400).build();
+        }
+
         User user = userDAO.verifyToken(token);
+        if (user == null) {
+            return Response.status(401).build();
+        }
 
         return Response.status(200).entity(getAllPlaylistsList(user)).build();
     }
@@ -64,13 +71,19 @@ public class PlaylistService {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createPlaylist(PlaylistDTO newPlaylistDTO, @QueryParam("token") String token) {
+        if(token == null || newPlaylistDTO == null) {
+            return Response.status(400).build();
+        }
         User user = userDAO.verifyToken(token);
+        if (user == null) {
+            return Response.status(401).build();
+        }
 
         if (playlistDAO.createPlaylist(newPlaylistDTO, user.getUser())) {
             return Response.status(200).entity(getAllPlaylistsList(user)).build();
         }
 
-        return Response.status(404).build();
+        return Response.status(400).build();
     }
 
     @PUT
@@ -78,7 +91,14 @@ public class PlaylistService {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createPlaylist(@PathParam("id") int playlistid, PlaylistDTO newPlaylistDTO, @QueryParam("token") String token) {
+        if(token == null || playlistid < 1 || newPlaylistDTO == null || token == null) {
+            return Response.status(400).build();
+        }
+
         User user = userDAO.verifyToken(token);
+        if (user == null) {
+            return Response.status(401).build();
+        }
 
         if (playlistDAO.editPlaylist(playlistid, newPlaylistDTO)) {
             return Response.status(200).entity(getAllPlaylistsList(user)).build();
@@ -92,7 +112,13 @@ public class PlaylistService {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deletePlaylist(@PathParam("id") int playlistid, @QueryParam("token") String token) {
+        if(token == null || playlistid < 1) {
+            return Response.status(400).build();
+        }
         User user = userDAO.verifyToken(token);
+        if (user == null) {
+            return Response.status(401).build();
+        }
 
         if (playlistDAO.deletePlaylist(playlistid)) {
             return Response.status(200).entity(getAllPlaylistsList(user)).build();
@@ -106,7 +132,13 @@ public class PlaylistService {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteTrackInPlaylist(@PathParam("playlistid") int playlistid, @PathParam("trackid") int trackid, @QueryParam("token") String token) {
+        if(token == null || playlistid < 1 || trackid < 1) {
+            return Response.status(400).build();
+        }
         User user = userDAO.verifyToken(token);
+        if (user == null) {
+            return Response.status(401).build();
+        }
 
         if (playlistDAO.deleteTrackInPLaylist(playlistid, trackid)) {
             ArrayList<Track> tracks = playlistDAO.getTracksFromPlaylist(playlistid);
@@ -123,7 +155,13 @@ public class PlaylistService {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createPlaylist(@PathParam("playlistid") int playlistid, @QueryParam("token") String token, TrackDTO trackDTO) {
+        if(token == null || playlistid < 1 || trackDTO == null) {
+            return Response.status(400).build();
+        }
         User user = userDAO.verifyToken(token);
+        if (user == null) {
+            return Response.status(401).build();
+        }
 
         if (playlistDAO.addTrackToPlaylist(playlistid, trackDTO.id)) {
             ArrayList<Track> tracks = playlistDAO.getTracksFromPlaylist(playlistid);
@@ -139,7 +177,13 @@ public class PlaylistService {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getTracks(@QueryParam("token") String token, @PathParam("id") int playlistid) {
+        if(token == null || playlistid < 1) {
+            return Response.status(400).build();
+        }
         User user = userDAO.verifyToken(token);
+        if (user == null) {
+            return Response.status(401).build();
+        }
 
         TracklistDTO tracklistDTO = new TracklistDTO();
         tracklistDTO.tracks = playlistDAO.getTracksFromPlaylist(playlistid);
