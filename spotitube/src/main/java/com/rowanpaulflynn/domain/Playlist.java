@@ -7,11 +7,20 @@ public class Playlist {
     private String name;
     private String owner;
     private ArrayList tracks;
+    private int length;
 
     public Playlist(String name, String owner) {
         this.name = name;
         this.owner = owner;
     }
+    public int getLength() {
+        return length;
+    }
+
+    public void setLength(int length) {
+        this.length = length;
+    }
+
 
     public ArrayList getTracks() {
         return tracks;

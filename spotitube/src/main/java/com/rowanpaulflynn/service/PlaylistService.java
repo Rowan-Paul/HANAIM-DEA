@@ -6,6 +6,7 @@ import com.rowanpaulflynn.domain.Playlist;
 import com.rowanpaulflynn.domain.Track;
 import com.rowanpaulflynn.domain.User;
 import com.rowanpaulflynn.service.dto.PlaylistDTO;
+import com.rowanpaulflynn.service.dto.PlaylistsDTO;
 import com.rowanpaulflynn.service.dto.TrackDTO;
 
 import javax.inject.Inject;
@@ -33,7 +34,9 @@ public class PlaylistService {
             return Response.status(404).build();
         }
 
-        ArrayList<PlaylistDTO> playlistsDTO = new ArrayList<>();
+        PlaylistsDTO playlistsDTO = new PlaylistsDTO();
+        playlistsDTO.playlists = new ArrayList<>();
+        playlistsDTO.length = 69;
 
         playlists.forEach((playlist) -> {
             Playlist pl = (Playlist) playlist;
@@ -42,6 +45,7 @@ public class PlaylistService {
             playlistDTO.id = pl.getId();
             playlistDTO.name = pl.getName();
             playlistDTO.tracks = pl.getTracks();
+            playlistDTO.length = 69;
 
             if (pl.getOwner().equals(user.getUser())) {
                 playlistDTO.owner = true;
@@ -49,7 +53,7 @@ public class PlaylistService {
                 playlistDTO.owner = false;
             }
 
-            playlistsDTO.add(playlistDTO);
+            playlistsDTO.playlists.add(playlistDTO);
         });
 
         return Response.status(200).entity(playlistsDTO).build();

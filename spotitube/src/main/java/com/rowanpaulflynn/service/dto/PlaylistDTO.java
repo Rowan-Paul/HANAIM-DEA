@@ -7,4 +7,5 @@ public class PlaylistDTO {
     public String name;
     public Boolean owner;
     public ArrayList tracks;
+    public int length;
 }

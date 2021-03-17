@@ -37,11 +37,11 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.airhacks/jaxrs-cors -->
         <dependency>
             <groupId>com.airhacks</groupId>
             <artifactId>jaxrs-cors</artifactId>
-            <version>0.0.1</version>
-            <scope>compile</scope>
+            <version>0.0.2</version>
         </dependency>
 
         <dependency>

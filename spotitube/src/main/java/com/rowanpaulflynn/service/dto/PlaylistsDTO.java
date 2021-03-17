@@ -4,4 +4,5 @@ import java.util.ArrayList;
 
 public class PlaylistsDTO {
     public ArrayList playlists;
+    public int length;
 }
