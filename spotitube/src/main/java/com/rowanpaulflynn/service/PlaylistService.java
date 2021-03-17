@@ -16,7 +16,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 
-//TODO: check status codes
 @Path("/playlists")
 public class PlaylistService {
     private IPlaylistDAO playlistDAO;
@@ -43,16 +42,18 @@ public class PlaylistService {
         ArrayList playlists = playlistDAO.getPlaylists();
         PlaylistsDTO playlistsDTO = new PlaylistsDTO();
         playlistsDTO.playlists = new ArrayList<>();
-        playlistsDTO.length = 69;
 
-        playlists.forEach((playlist) -> {
+        int length = 0;
+
+        for (Object playlist : playlists){
             Playlist pl = (Playlist) playlist;
 
             PlaylistDTO playlistDTO = new PlaylistDTO();
             playlistDTO.id = pl.getId();
             playlistDTO.name = pl.getName();
             playlistDTO.tracks = pl.getTracks();
-            playlistDTO.length = 69;
+            playlistDTO.length = pl.getLength();
+            length += pl.getLength();
 
             if (pl.getOwner().equals(user.getUser())) {
                 playlistDTO.owner = true;
@@ -61,7 +62,9 @@ public class PlaylistService {
             }
 
             playlistsDTO.playlists.add(playlistDTO);
-        });
+        };
+
+        playlistsDTO.length = length;
 
         return playlistsDTO;
     }

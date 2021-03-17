@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 //TODO: move certain track related functions to TrackDAO
-//TODO: implement length of playlist
 //TODO: don't use DTO here
 @Default
 public class PlaylistDAO implements IPlaylistDAO {
@@ -37,6 +36,7 @@ public class PlaylistDAO implements IPlaylistDAO {
                         resultSet.getString("owner"));
                 playlist.setId(resultSet.getInt("id"));
                 playlist.setTracks(getTracksFromPlaylist(resultSet.getInt("id")));
+                playlist.setLength(calculatePlaylistLength(playlist.getTracks()));
 
                 playlists.add(playlist);
             }
@@ -70,6 +70,16 @@ public class PlaylistDAO implements IPlaylistDAO {
             exception.printStackTrace();
         }
         return null;
+    }
+
+    public int calculatePlaylistLength(ArrayList<Track> tracks) {
+        int length = 0;
+
+        for (Track track : tracks) {
+            length += track.getDuration();
+        }
+
+        return length;
     }
 
 
@@ -199,7 +209,7 @@ public class PlaylistDAO implements IPlaylistDAO {
             statement.setString(1, playlistDTO.name);
             statement.setInt(2, playlistid);
             int resultSet = statement.executeUpdate();
-            
+
             deleteTracksInPLaylist(playlistid);
             for (Object track : playlistDTO.tracks) {
                 HashMap tk = (HashMap) track;
