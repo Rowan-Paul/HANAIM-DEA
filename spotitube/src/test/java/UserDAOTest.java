@@ -12,6 +12,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class UserDAOTest {
+    DataSource dataSource = mock(DataSource.class);
+    Connection connection = mock(Connection.class);
+    PreparedStatement preparedStatement = mock(PreparedStatement.class);
+    ResultSet resultSet = mock(ResultSet.class);
+
+    UserDAO userDAO = new UserDAO();
+
     @Test
     public void getUserTest() {
         try {
@@ -19,20 +26,15 @@ public class UserDAOTest {
             final String expectedSQL = "select * from users where user = ?";
             final String username = "rowan";
 
-            // setup mocks
-            DataSource dataSource = mock(DataSource.class);
-            Connection connection = mock(Connection.class);
-            PreparedStatement preparedStatement = mock(PreparedStatement.class);
-            ResultSet resultSet = mock(ResultSet.class);
-
             // instruct mocks
             when(dataSource.getConnection()).thenReturn(connection);
             when(connection.prepareStatement(expectedSQL)).thenReturn(preparedStatement);
             when(preparedStatement.executeQuery()).thenReturn(resultSet);
-            when(resultSet.next()).thenReturn(false);
+            when(resultSet.next()).thenReturn(true).thenReturn(false);
+
+            when(resultSet.getString("user")).thenReturn(username);
 
             // setup classes
-            UserDAO userDAO = new UserDAO();
             userDAO.setDataSource(dataSource);
 
             // Act
@@ -42,7 +44,7 @@ public class UserDAOTest {
             verify(connection).prepareStatement(expectedSQL);
             verify(preparedStatement).setString(1, username);
 
-            assertNull(user);
+            assertEquals(username, user.getUser());
         } catch (Exception e) {
             fail();
             e.getMessage();
@@ -56,21 +58,11 @@ public class UserDAOTest {
             final String expectedSQL = "select * from users where dog = ?";
             final String username = "rowan";
 
-            // setup mocks
-            DataSource dataSource = mock(DataSource.class);
-            Connection connection = mock(Connection.class);
-            PreparedStatement preparedStatement = mock(PreparedStatement.class);
-            ResultSet resultSet = mock(ResultSet.class);
-
             // instruct mocks
             when(dataSource.getConnection()).thenReturn(connection);
             when(connection.prepareStatement(expectedSQL)).thenReturn(preparedStatement);
             when(preparedStatement.executeQuery()).thenReturn(resultSet);
-            when(resultSet.next()).thenReturn(false);
-
-            // setup classes
-            UserDAO userDAO = new UserDAO();
-            userDAO.setDataSource(dataSource);
+            when(resultSet.next()).thenReturn(true).thenReturn(false);
 
             // Act & Assert
             assertThrows(NullPointerException.class, () -> {
@@ -87,21 +79,15 @@ public class UserDAOTest {
     public void createTokenTest() {
         try {
             // Arrange
-            final String expectedSQL = "INSERT INTO tokens (`token`, `user`) VALUES (?, ?)";
+            final String expectedSQL = "insert into tokens (`token`, `user`) values (?, ?)";
             final String username = "rowan";
-
-            // setup mocks
-            DataSource dataSource = mock(DataSource.class);
-            Connection connection = mock(Connection.class);
-            PreparedStatement preparedStatement = mock(PreparedStatement.class);
 
             // instruct mocks
             when(dataSource.getConnection()).thenReturn(connection);
             when(connection.prepareStatement(expectedSQL)).thenReturn(preparedStatement);
-            when(preparedStatement.executeUpdate()).thenReturn(0);
+            when(preparedStatement.executeUpdate()).thenReturn(1);
+            when(resultSet.next()).thenReturn(true).thenReturn(false);
 
-            // setup classes
-            UserDAO userDAO = new UserDAO();
             userDAO.setDataSource(dataSource);
 
             // Act
@@ -109,7 +95,10 @@ public class UserDAOTest {
 
             // Assert
             verify(connection).prepareStatement(expectedSQL);
-            verify(preparedStatement).setString(2, username);
+            verify(preparedStatement).setString(1, token.getToken());
+            verify(preparedStatement).setString(2, token.getUser());
+
+            assertEquals(username, token.getUser());
         } catch (Exception e) {
             fail();
             e.getMessage();
@@ -117,32 +106,31 @@ public class UserDAOTest {
     }
 
     @Test
-    public void createTokenWrongStatementTest() {
+    public void verifyTokenTest() {
         try {
             // Arrange
-            final String expectedSQL = "INSERT INTO token (`token`, `user`) VALUES (?, ?)";
+            final String expectedSQL = "select * from tokens where token = ?";
             final String username = "rowan";
-
-            // setup mocks
-            DataSource dataSource = mock(DataSource.class);
-            Connection connection = mock(Connection.class);
-            PreparedStatement preparedStatement = mock(PreparedStatement.class);
+            final String expectedToken = "abb94ad7-1e79-43a7-a726-dc014e202351";
 
             // instruct mocks
             when(dataSource.getConnection()).thenReturn(connection);
             when(connection.prepareStatement(expectedSQL)).thenReturn(preparedStatement);
-            when(preparedStatement.executeUpdate()).thenReturn(0);
+            when(preparedStatement.executeQuery()).thenReturn(resultSet);
+            when(resultSet.next()).thenReturn(true).thenReturn(false);
 
-            // setup classes
-            UserDAO userDAO = new UserDAO();
+            when(resultSet.getString("user")).thenReturn(username);
+
             userDAO.setDataSource(dataSource);
 
+            // Act
+            User user = userDAO.verifyToken(expectedToken);
 
-            // Act & Assert
-            assertThrows(NullPointerException.class, () -> {
-                        Token token = userDAO.createToken(username);
-                    }
-            );
+            // Assert
+            verify(connection).prepareStatement(expectedSQL);
+            verify(preparedStatement).setString(1, expectedToken);
+
+            assertEquals(username, user.getUser());
         } catch (Exception e) {
             fail();
             e.getMessage();

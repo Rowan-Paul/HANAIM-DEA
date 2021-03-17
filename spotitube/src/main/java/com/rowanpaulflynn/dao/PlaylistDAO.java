@@ -16,6 +16,7 @@ import java.util.HashMap;
 
 //TODO: move certain track related functions to TrackDAO
 //TODO: don't use DTO here
+//TODO: add offlineAvailable or something
 @Default
 public class PlaylistDAO implements IPlaylistDAO {
     @Resource(name = "jdbc/spotitube")
