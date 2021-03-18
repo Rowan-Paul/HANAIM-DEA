@@ -11,7 +11,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 //TODO: move certain track related functions to TrackDAO
 //TODO: add offlineAvailable or something
@@ -25,7 +24,7 @@ public class PlaylistDAO implements IPlaylistDAO {
     public ArrayList<Playlist> getPlaylists() {
         String sql = "select * from playlists";
 
-        try (Connection connection = dataSource.getConnection();) {
+        try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(sql);
             ResultSet resultSet = statement.executeQuery();
 
@@ -64,7 +63,7 @@ public class PlaylistDAO implements IPlaylistDAO {
     public ArrayList<Track> getTracksFromPlaylist(int playlistid) {
         String sql = "select * from playlisttracks where playlistid = ?";
 
-        try (Connection connection = dataSource.getConnection();) {
+        try (Connection connection = dataSource.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, playlistid);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -89,7 +88,7 @@ public class PlaylistDAO implements IPlaylistDAO {
     public Track getTrackInfo(int trackid) {
         String sql = "select * from tracks where id = ?";
 
-        try (Connection connection = dataSource.getConnection();) {
+        try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, trackid);
             ResultSet resultSet = statement.executeQuery();
@@ -117,12 +116,12 @@ public class PlaylistDAO implements IPlaylistDAO {
     public Boolean deletePlaylist(int playlistid) {
         String sql = "delete from playlists where id = ?";
 
-        try (Connection connection = dataSource.getConnection();) {
+        try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, playlistid);
             int resultSet = statement.executeUpdate();
 
-            if(deleteTracksInPLaylist(playlistid)){
+            if(deleteTracksInPlaylist(playlistid)){
                 return true;
             }
 
@@ -137,7 +136,7 @@ public class PlaylistDAO implements IPlaylistDAO {
     public Boolean createPlaylist(Playlist playlist, String owner) {
         String sql = "insert into playlists (`name`, `owner`) values (?, ?)";
 
-        try (Connection connection = dataSource.getConnection();) {
+        try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, playlist.getName());
             statement.setString(2, owner);
@@ -164,9 +163,9 @@ public class PlaylistDAO implements IPlaylistDAO {
 
     @Override
     public int getPlaylistIdFromName(String playlistname) {
-        String sql = "select id from playlists where name = ?";
+        String sql = "select * from playlists where name = ?";
 
-        try (Connection connection = dataSource.getConnection();) {
+        try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, playlistname);
             ResultSet resultSet = statement.executeQuery();
@@ -186,7 +185,7 @@ public class PlaylistDAO implements IPlaylistDAO {
     public Boolean addTrackToPlaylist(int playlistid, int trackid) {
         String sql = "insert into playlisttracks (`playlistid`, `trackid`) values (?, ?)";
 
-        try (Connection connection = dataSource.getConnection();) {
+        try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, playlistid);
             statement.setInt(2, trackid);
@@ -205,18 +204,18 @@ public class PlaylistDAO implements IPlaylistDAO {
     public Boolean editPlaylist(int playlistid, Playlist playlist) {
         String sql = "update playlists set name = ? where id = ?";
 
-        try (Connection connection = dataSource.getConnection();) {
+        try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, playlist.getName());
             statement.setInt(2, playlistid);
             int resultSet = statement.executeUpdate();
 
-            deleteTracksInPLaylist(playlistid);
-            for (Object track : playlist.getTracks()) {
-                HashMap tk = (HashMap) track;
-                Number trackid = (Number) tk.get("id");
+            deleteTracksInPlaylist(playlistid);
 
-                addTrackToPlaylist(playlistid, trackid.intValue());
+            ArrayList<Track> tracks = playlist.getTracks();
+
+            for (Track track : tracks) {
+                addTrackToPlaylist(playlistid, track.getId());
             }
 
             return true;
@@ -229,10 +228,10 @@ public class PlaylistDAO implements IPlaylistDAO {
     }
 
     @Override
-    public Boolean deleteTracksInPLaylist(int playlistid) {
+    public Boolean deleteTracksInPlaylist(int playlistid) {
         String sql = "delete from playlisttracks where playlistid = ?";
 
-        try (Connection connection = dataSource.getConnection();) {
+        try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, playlistid);
             int resultSet = statement.executeUpdate();
@@ -247,10 +246,10 @@ public class PlaylistDAO implements IPlaylistDAO {
     }
 
     @Override
-    public Boolean deleteTrackInPLaylist(int playlistid, int trackid) {
+    public Boolean deleteTrackInPlaylist(int playlistid, int trackid) {
         String sql = "delete from playlisttracks where playlistid = ? and trackid = ?";
 
-        try (Connection connection = dataSource.getConnection();) {
+        try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, playlistid);
             statement.setInt(2, trackid);

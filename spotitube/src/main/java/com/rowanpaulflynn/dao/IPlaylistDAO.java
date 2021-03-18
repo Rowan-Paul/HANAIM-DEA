@@ -15,6 +15,6 @@ public interface IPlaylistDAO {
     Boolean addTrackToPlaylist(int playlistid, int trackid);
     int getPlaylistIdFromName(String playlistname);
     Boolean editPlaylist(int playlistid, Playlist playlist);
-    Boolean deleteTracksInPLaylist(int playlistid);
-    Boolean deleteTrackInPLaylist(int playlistid, int trackid);
+    Boolean deleteTracksInPlaylist(int playlistid);
+    Boolean deleteTrackInPlaylist(int playlistid, int trackid);
 }
