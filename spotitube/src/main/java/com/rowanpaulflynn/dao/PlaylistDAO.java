@@ -2,7 +2,6 @@ package com.rowanpaulflynn.dao;
 
 import com.rowanpaulflynn.domain.Playlist;
 import com.rowanpaulflynn.domain.Track;
-import com.rowanpaulflynn.service.dto.PlaylistDTO;
 
 import javax.annotation.Resource;
 import javax.enterprise.inject.Default;
@@ -15,8 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 //TODO: move certain track related functions to TrackDAO
-//TODO: don't use DTO here
 //TODO: add offlineAvailable or something
+//TODO: add custom exceptions
 @Default
 public class PlaylistDAO implements IPlaylistDAO {
     @Resource(name = "jdbc/spotitube")
@@ -50,6 +49,7 @@ public class PlaylistDAO implements IPlaylistDAO {
         return null;
     }
 
+    @Override
     public int calculatePlaylistLength(ArrayList<Track> tracks) {
         int length = 0;
 
@@ -122,9 +122,9 @@ public class PlaylistDAO implements IPlaylistDAO {
             statement.setInt(1, playlistid);
             int resultSet = statement.executeUpdate();
 
-            deleteTracksInPLaylist(playlistid);
-
-            return true;
+            if(deleteTracksInPLaylist(playlistid)){
+                return true;
+            }
 
         } catch (SQLException exception) {
             exception.printStackTrace();
@@ -134,23 +134,22 @@ public class PlaylistDAO implements IPlaylistDAO {
     }
 
     @Override
-    public Boolean createPlaylist(PlaylistDTO playlistDTO, String owner) {
+    public Boolean createPlaylist(Playlist playlist, String owner) {
         String sql = "insert into playlists (`name`, `owner`) values (?, ?)";
 
         try (Connection connection = dataSource.getConnection();) {
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, playlistDTO.name);
+            statement.setString(1, playlist.getName());
             statement.setString(2, owner);
             int resultSet = statement.executeUpdate();
 
-            if (playlistDTO.tracks != null) {
-                int playlistId = getPlaylistIdFromName(playlistDTO.name);
+            if (playlist.getTracks() != null) {
+                int playlistId = getPlaylistIdFromName(playlist.getName());
 
-                for (Object trackDTO : playlistDTO.tracks) {
-                    HashMap tk = (HashMap) trackDTO;
-                    Number trackid = (Number) tk.get("id");
+                ArrayList<Track> tracks = playlist.getTracks();
 
-                    addTrackToPlaylist(playlistId, trackid.intValue());
+                for (Track track : tracks) {
+                    addTrackToPlaylist(playlistId, track.getId());
                 }
             }
 
@@ -203,17 +202,17 @@ public class PlaylistDAO implements IPlaylistDAO {
     }
 
     @Override
-    public Boolean editPlaylist(int playlistid, PlaylistDTO playlistDTO) {
+    public Boolean editPlaylist(int playlistid, Playlist playlist) {
         String sql = "update playlists set name = ? where id = ?";
 
         try (Connection connection = dataSource.getConnection();) {
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setString(1, playlistDTO.name);
+            statement.setString(1, playlist.getName());
             statement.setInt(2, playlistid);
             int resultSet = statement.executeUpdate();
 
             deleteTracksInPLaylist(playlistid);
-            for (Object track : playlistDTO.tracks) {
+            for (Object track : playlist.getTracks()) {
                 HashMap tk = (HashMap) track;
                 Number trackid = (Number) tk.get("id");
 

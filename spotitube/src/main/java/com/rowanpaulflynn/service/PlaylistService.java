@@ -82,7 +82,12 @@ public class PlaylistService {
             return Response.status(401).build();
         }
 
-        if (playlistDAO.createPlaylist(newPlaylistDTO, user.getUser())) {
+        Playlist playlist = new Playlist(newPlaylistDTO.name, user.getUser());
+        playlist.setId(newPlaylistDTO.id);
+        playlist.setTracks(newPlaylistDTO.tracks);
+        playlist.setLength(newPlaylistDTO.length);
+
+        if (playlistDAO.createPlaylist(playlist, user.getUser())) {
             return Response.status(200).entity(getAllPlaylistsList(user)).build();
         }
 
@@ -103,7 +108,12 @@ public class PlaylistService {
             return Response.status(401).build();
         }
 
-        if (playlistDAO.editPlaylist(playlistid, newPlaylistDTO)) {
+        Playlist playlist = new Playlist(newPlaylistDTO.name, user.getUser());
+        playlist.setId(newPlaylistDTO.id);
+        playlist.setTracks(newPlaylistDTO.tracks);
+        playlist.setLength(newPlaylistDTO.length);
+
+        if (playlistDAO.editPlaylist(playlistid, playlist)) {
             return Response.status(200).entity(getAllPlaylistsList(user)).build();
         }
 
