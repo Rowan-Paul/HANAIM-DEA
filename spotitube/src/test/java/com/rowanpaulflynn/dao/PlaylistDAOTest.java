@@ -124,6 +124,7 @@ public class PlaylistDAOTest {
 
             verify(dataSource).getConnection();
             verify(connection).prepareStatement(expectedSQL);
+            verify(preparedStatement).setInt(1, expectedId);
 
             assertEquals(expectedTrack1, tracks.get(0));
         } catch (Exception e) {
@@ -150,6 +151,7 @@ public class PlaylistDAOTest {
 
             verify(dataSource).getConnection();
             verify(connection).prepareStatement(expectedSQL);
+            verify(preparedStatement).setInt(1, expectedTrack1.getId());
 
             assertEquals(expectedTrack1.getTitle(), track.getTitle());
             assertEquals(expectedTrack1.getId(), track.getId());
@@ -161,7 +163,7 @@ public class PlaylistDAOTest {
     }
 
     @Test
-    public void deletePlaylist() {
+    public void deletePlaylistTest() {
         try {
             final String expectedSQL = "delete from playlists where id = ?";
             int expectedId = 1;
@@ -176,6 +178,7 @@ public class PlaylistDAOTest {
 
             verify(dataSource).getConnection();
             verify(connection).prepareStatement(expectedSQL);
+            verify(preparedStatement).setInt(1, expectedId);
 
             assertEquals(true, deletePlaylist);
         } catch (Exception e) {
@@ -185,7 +188,7 @@ public class PlaylistDAOTest {
     }
 
     @Test
-    public void createPlaylist() {
+    public void createPlaylistTest() {
         try {
             final String expectedSQL = "insert into playlists (`name`, `owner`) values (?, ?)";
             int expectedId = 1;
@@ -206,6 +209,8 @@ public class PlaylistDAOTest {
 
             verify(dataSource).getConnection();
             verify(connection).prepareStatement(expectedSQL);
+            verify(preparedStatement).setString(1, expectedName);
+            verify(preparedStatement).setString(2, expectedOwner);
 
             assertEquals(true, createPlaylist);
         } catch (Exception e) {
