@@ -142,7 +142,7 @@ public class PlaylistDAO implements IPlaylistDAO {
             statement.setString(2, owner);
             int resultSet = statement.executeUpdate();
 
-            if (playlist.getTracks() != null) {
+            if(playlist.getTracks().size() > 0) {
                 int playlistId = getPlaylistIdFromName(playlist.getName());
 
                 ArrayList<Track> tracks = playlist.getTracks();
@@ -210,16 +210,15 @@ public class PlaylistDAO implements IPlaylistDAO {
             statement.setInt(2, playlistid);
             int resultSet = statement.executeUpdate();
 
-            deleteTracksInPlaylist(playlistid);
+            if(playlist.getTracks().size() > 0) {
+                deleteTracksInPlaylist(playlistid);
+                ArrayList<Track> tracks = playlist.getTracks();
 
-            ArrayList<Track> tracks = playlist.getTracks();
-
-            for (Track track : tracks) {
-                addTrackToPlaylist(playlistid, track.getId());
+                for (Track track : tracks) {
+                    addTrackToPlaylist(playlistid, track.getId());
+                }
             }
-
             return true;
-
         } catch (SQLException exception) {
             exception.printStackTrace();
         }
