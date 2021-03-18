@@ -1,6 +1,9 @@
+package com.rowanpaulflynn.dao;
+
 import com.rowanpaulflynn.dao.UserDAO;
 import com.rowanpaulflynn.domain.Token;
 import com.rowanpaulflynn.domain.User;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.sql.DataSource;
@@ -12,12 +15,22 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class UserDAOTest {
-    DataSource dataSource = mock(DataSource.class);
-    Connection connection = mock(Connection.class);
-    PreparedStatement preparedStatement = mock(PreparedStatement.class);
-    ResultSet resultSet = mock(ResultSet.class);
+    private UserDAO userDAO;
+    private DataSource dataSource;
+    private Connection connection;
+    private PreparedStatement preparedStatement;
+    private ResultSet resultSet;
 
-    UserDAO userDAO = new UserDAO();
+    @BeforeEach
+    public void setup() {
+        dataSource = mock(DataSource.class);
+        connection = mock(Connection.class);
+        preparedStatement = mock(PreparedStatement.class);
+        resultSet = mock(ResultSet.class);
+
+        userDAO = new UserDAO();
+        userDAO.setDataSource(dataSource);
+    }
 
     @Test
     public void getUserTest() {
@@ -34,9 +47,6 @@ public class UserDAOTest {
 
             when(resultSet.getString("user")).thenReturn(username);
 
-            // setup classes
-            userDAO.setDataSource(dataSource);
-
             // Act
             User user = userDAO.getUser(username);
 
@@ -45,30 +55,6 @@ public class UserDAOTest {
             verify(preparedStatement).setString(1, username);
 
             assertEquals(username, user.getUser());
-        } catch (Exception e) {
-            fail(e);
-            e.getMessage();
-        }
-    }
-
-    @Test
-    public void getUserWrongStatementTest() {
-        try {
-            // Arrange
-            final String expectedSQL = "select * from users where dog = ?";
-            final String username = "rowan";
-
-            // instruct mocks
-            when(dataSource.getConnection()).thenReturn(connection);
-            when(connection.prepareStatement(expectedSQL)).thenReturn(preparedStatement);
-            when(preparedStatement.executeQuery()).thenReturn(resultSet);
-            when(resultSet.next()).thenReturn(true).thenReturn(false);
-
-            // Act & Assert
-            assertThrows(NullPointerException.class, () -> {
-                        User user = userDAO.getUser(username);
-                    }
-            );
         } catch (Exception e) {
             fail(e);
             e.getMessage();
@@ -87,8 +73,6 @@ public class UserDAOTest {
             when(connection.prepareStatement(expectedSQL)).thenReturn(preparedStatement);
             when(preparedStatement.executeUpdate()).thenReturn(1);
             when(resultSet.next()).thenReturn(true).thenReturn(false);
-
-            userDAO.setDataSource(dataSource);
 
             // Act
             Token token = userDAO.createToken(username);
@@ -120,8 +104,6 @@ public class UserDAOTest {
             when(resultSet.next()).thenReturn(true).thenReturn(false);
 
             when(resultSet.getString("user")).thenReturn(username);
-
-            userDAO.setDataSource(dataSource);
 
             // Act
             User user = userDAO.verifyToken(expectedToken);

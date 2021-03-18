@@ -1,5 +1,8 @@
+package com.rowanpaulflynn.dao;
+
 import com.rowanpaulflynn.dao.TrackDAO;
 import com.rowanpaulflynn.domain.Track;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.sql.DataSource;
@@ -12,12 +15,22 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class TrackDAOTest {
-    DataSource dataSource = mock(DataSource.class);
-    Connection connection = mock(Connection.class);
-    PreparedStatement preparedStatement = mock(PreparedStatement.class);
-    ResultSet resultSet = mock(ResultSet.class);
+    private TrackDAO trackDAO;
+    private DataSource dataSource;
+    private Connection connection;
+    private PreparedStatement preparedStatement;
+    private ResultSet resultSet;
 
-    TrackDAO trackDAO = new TrackDAO();
+    @BeforeEach
+    public void setup() {
+        dataSource = mock(DataSource.class);
+        connection = mock(Connection.class);
+        preparedStatement = mock(PreparedStatement.class);
+        resultSet = mock(ResultSet.class);
+
+        trackDAO = new TrackDAO();
+        trackDAO.setDataSource(dataSource);
+    }
 
     @Test
     public void getTracksTest() {
@@ -38,16 +51,12 @@ public class TrackDAOTest {
             when(resultSet.getString("title")).thenReturn(expectedTitle);
             when(resultSet.getString("performer")).thenReturn(expectedPerformer);
 
-            // setup classes
-            trackDAO.setDataSource(dataSource);
-
             // Act
             ArrayList<Track> tracks = trackDAO.getTracks();
 
             // Assert
             verify(dataSource).getConnection();
             verify(connection).prepareStatement(expectedSQL);
-            verify(preparedStatement.executeQuery());
 
             assertEquals(expectedId, tracks.get(0).getId());
             assertEquals(expectedTitle, tracks.get(0).getTitle());

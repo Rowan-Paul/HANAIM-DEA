@@ -1,3 +1,5 @@
+package com.rowanpaulflynn.dao;
+
 import com.rowanpaulflynn.dao.IUserDAO;
 import com.rowanpaulflynn.domain.Token;
 import com.rowanpaulflynn.domain.User;
