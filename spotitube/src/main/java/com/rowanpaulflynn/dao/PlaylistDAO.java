@@ -78,8 +78,6 @@ public class PlaylistDAO implements IPlaylistDAO {
         }
     }
 
-
-
     @Override
     public Track getTrackInfo(int trackid) throws InternalServerError {
         String sql = "select * from tracks where id = ?";

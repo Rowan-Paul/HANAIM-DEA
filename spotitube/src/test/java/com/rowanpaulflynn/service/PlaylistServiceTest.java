@@ -32,12 +32,26 @@ public class PlaylistServiceTest {
     PlaylistsDTO expectedPlaylistsDTO;
     ArrayList<Playlist> playlists;
 
+    PlaylistDTO playlistDTO;
+    Playlist playlist;
+
     @BeforeEach
     public void beforeEachSetUp() {
         playlistService = new PlaylistService();
         mockPlaylistService = Mockito.spy(playlistService);
         mockPlaylistService.setPlaylistDAO(playlistDAOMock);
         mockPlaylistService.setUserDAO(userDAOMock);
+
+        // PlaylistDTO
+        playlistDTO = new PlaylistDTO();
+        playlistDTO.name = "playlistname";
+        playlistDTO.owner = false;
+        playlistDTO.id = -1;
+
+        playlist = new Playlist(playlistDTO.name, user.getUser());
+        playlist.setId(playlistDTO.id);
+        playlist.setTracks(playlistDTO.tracks);
+        playlist.setLength(playlistDTO.length);
 
         // PlaylistsDTO expectedPlaylistsDTO
         playlist1 = new ArrayList<>();
@@ -87,6 +101,9 @@ public class PlaylistServiceTest {
         playlists.add(pl2);
     }
 
+    /**
+     * getAllPlaylists()
+     * */
     @Test
     public void getAllPlaylistsTest() {
         int expectedStatuscode = 200;
@@ -122,6 +139,9 @@ public class PlaylistServiceTest {
         assertEquals(expectedStatuscode, response.getStatus());
     }
 
+    /**
+     * getAllPlaylistsList()
+     * */
     @Test
     public void getAllPlaylistsListTest() {
         when(playlistDAOMock.getPlaylists()).thenReturn(playlists);
@@ -133,26 +153,207 @@ public class PlaylistServiceTest {
     }
 
     //TODO: make this work
+    /**
+     * createPlaylist()
+     * */
 //    @Test
 //    public void createPlaylistTest() {
 //        int expectedStatusCode = 200;
-//        PlaylistDTO playlistDTO = new PlaylistDTO();
-//        playlistDTO.name = "playlistname";
-//        playlistDTO.owner = false;
-//        playlistDTO.id = -1;
-//
-//        Playlist playlist = new Playlist(playlistDTO.name, user.getUser());
-//        playlist.setId(playlistDTO.id);
-//        playlist.setTracks(playlistDTO.tracks);
-//        playlist.setLength(playlistDTO.length);
 //
 //        when(userDAOMock.verifyToken(token.getToken())).thenReturn(user);
-//        doReturn(true).when(playlistDAOMock).createPlaylist(playlist, user.getUser());
+//        when(playlistDAOMock.createPlaylist(playlist, user.getUser())).thenReturn(true);
 //        doReturn(expectedPlaylistsDTO).when(mockPlaylistService).getAllPlaylistsList(user);
 //
 //        Response response = mockPlaylistService.createPlaylist(playlistDTO,token.getToken());
 //
 //        assertEquals(expectedStatusCode, response.getStatus());
 //    }
-}
+    @Test
+    public void createPlaylistFailedTest() {
+        int expectedStatuscode = 400;
 
+        when(userDAOMock.verifyToken(token.getToken())).thenReturn(user);
+        when(playlistDAOMock.createPlaylist(playlist, user.getUser())).thenReturn(false);
+        doReturn(expectedPlaylistsDTO).when(mockPlaylistService).getAllPlaylistsList(user);
+
+        Response response = mockPlaylistService.createPlaylist(playlistDTO, token.getToken());
+
+        assertEquals(expectedStatuscode, response.getStatus());
+    }
+
+    @Test
+    public void createPlaylistNoTokenTest() {
+        int expectedStatuscode = 400;
+
+        Response response = mockPlaylistService.createPlaylist(playlistDTO, null);
+
+        assertEquals(expectedStatuscode, response.getStatus());
+    }
+
+    @Test
+    public void createPlaylistNoUserTest() {
+        int expectedStatuscode = 401;
+
+        when(userDAOMock.verifyToken(token.getToken())).thenReturn(null);
+        doReturn(expectedPlaylistsDTO).when(mockPlaylistService).getAllPlaylistsList(user);
+
+        Response response = mockPlaylistService.createPlaylist(playlistDTO, token.getToken());
+
+        assertEquals(expectedStatuscode, response.getStatus());
+    }
+
+    /**
+     * editPlaylist()
+     * */
+//    @Test
+//    public void editPlaylistTest() {
+//        int expectedStatuscode = 200;
+//        int playlistid = 1;
+//
+//        when(userDAOMock.verifyToken(token.getToken())).thenReturn(user);
+//        when(playlistDAOMock.editPlaylist(playlistid, playlist)).thenReturn(true);
+//        doReturn(expectedPlaylistsDTO).when(mockPlaylistService).getAllPlaylistsList(user);
+//
+//        Response response = mockPlaylistService.editPlaylist(playlistid, playlistDTO, token.getToken());
+//        PlaylistsDTO responsePlaylistsDTO = (PlaylistsDTO) response.getEntity();
+//
+//        assertEquals(expectedStatuscode, response.getStatus());
+//    }
+
+    @Test
+    public void editPlaylistFailedTest() {
+        int expectedStatuscode = 400;
+        int playlistid = 1;
+
+        when(userDAOMock.verifyToken(token.getToken())).thenReturn(user);
+        when(playlistDAOMock.editPlaylist(playlistid, playlist)).thenReturn(false);
+        doReturn(expectedPlaylistsDTO).when(mockPlaylistService).getAllPlaylistsList(user);
+
+        Response response = mockPlaylistService.editPlaylist(playlistid, playlistDTO, token.getToken());
+
+        assertEquals(expectedStatuscode, response.getStatus());
+    }
+
+    @Test
+    public void editPlaylistNoTokenTest() {
+        int expectedStatuscode = 400;
+        int playlistid = 1;
+
+        Response response = mockPlaylistService.editPlaylist(playlistid, playlistDTO, null);
+
+        assertEquals(expectedStatuscode, response.getStatus());
+    }
+
+    @Test
+    public void editPlaylistNoUserTest() {
+        int expectedStatuscode = 401;
+        int playlistid = 1;
+
+        when(userDAOMock.verifyToken(token.getToken())).thenReturn(null);
+        doReturn(expectedPlaylistsDTO).when(mockPlaylistService).getAllPlaylistsList(user);
+
+        Response response = mockPlaylistService.editPlaylist(playlistid, playlistDTO, token.getToken());
+
+        assertEquals(expectedStatuscode, response.getStatus());
+    }
+
+    /**
+     * deletePlaylist()
+     * */
+    @Test
+    public void deletePlaylistTest() {
+        int expectedStatuscode = 200;
+        int playlistid = 1;
+
+        when(userDAOMock.verifyToken(token.getToken())).thenReturn(user);
+        when(playlistDAOMock.deletePlaylist(playlistid)).thenReturn(true);
+        doReturn(expectedPlaylistsDTO).when(mockPlaylistService).getAllPlaylistsList(user);
+
+        Response response = mockPlaylistService.deletePlaylist(playlistid, token.getToken());
+        PlaylistsDTO responsePlaylistsDTO = (PlaylistsDTO) response.getEntity();
+
+        assertEquals(expectedStatuscode, response.getStatus());
+        assertEquals(expectedPlaylistsDTO, responsePlaylistsDTO);
+    }
+
+    @Test
+    public void deletePlaylistFailedTest() {
+        int expectedStatuscode = 400;
+        int playlistid = 1;
+
+        when(userDAOMock.verifyToken(token.getToken())).thenReturn(user);
+        when(playlistDAOMock.deletePlaylist(playlistid)).thenReturn(false);
+        doReturn(expectedPlaylistsDTO).when(mockPlaylistService).getAllPlaylistsList(user);
+
+        Response response = mockPlaylistService.deletePlaylist(playlistid, token.getToken());
+        PlaylistsDTO responsePlaylistsDTO = (PlaylistsDTO) response.getEntity();
+
+        assertEquals(expectedStatuscode, response.getStatus());
+    }
+
+    @Test
+    public void deletePlaylistNoTokenTest() {
+        int expectedStatuscode = 400;
+        int playlistid = 1;
+
+        Response response = mockPlaylistService.deletePlaylist(playlistid, null);
+
+        assertEquals(expectedStatuscode, response.getStatus());
+    }
+
+    @Test
+    public void deletePlaylistNoUserTest() {
+        int expectedStatuscode = 401;
+        int playlistid = 1;
+
+        when(userDAOMock.verifyToken(token.getToken())).thenReturn(null);
+        doReturn(expectedPlaylistsDTO).when(mockPlaylistService).getAllPlaylistsList(user);
+
+        Response response = mockPlaylistService.deletePlaylist(playlistid, token.getToken());
+
+        assertEquals(expectedStatuscode, response.getStatus());
+    }
+
+    /**
+     * deleteTrackInPlaylist()
+     * */
+    @Test
+    public void deleteTrackInPlaylistTest() {
+        int expectedStatuscode = 200;
+        int playlistid = 1;
+        int trackid = 2;
+
+        when(userDAOMock.verifyToken(token.getToken())).thenReturn(user);
+        when(playlistDAOMock.deleteTrackInPlaylist(playlistid,trackid)).thenReturn(true);
+        doReturn(expectedPlaylistsDTO).when(mockPlaylistService).getAllPlaylistsList(user);
+
+        Response response = mockPlaylistService.deleteTrackInPlaylist(playlistid, trackid, token.getToken());
+
+        assertEquals(expectedStatuscode, response.getStatus());
+    }
+
+    @Test
+    public void deleteTrackInPlaylistNoTokenTest() {
+        int expectedStatuscode = 400;
+        int playlistid = 1;
+        int trackid = 2;
+
+        Response response = mockPlaylistService.deleteTrackInPlaylist(playlistid, trackid, null);
+
+        assertEquals(expectedStatuscode, response.getStatus());
+    }
+
+    @Test
+    public void deleteTrackInPlaylistNoUserTest() {
+        int expectedStatuscode = 401;
+        int playlistid = 1;
+        int trackid = 2;
+
+        when(userDAOMock.verifyToken(token.getToken())).thenReturn(null);
+        doReturn(expectedPlaylistsDTO).when(mockPlaylistService).getAllPlaylistsList(user);
+
+        Response response = mockPlaylistService.deleteTrackInPlaylist(playlistid, trackid, token.getToken());
+
+        assertEquals(expectedStatuscode, response.getStatus());
+    }
+}
