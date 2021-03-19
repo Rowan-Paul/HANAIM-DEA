@@ -153,7 +153,7 @@ public class PlaylistServiceTest {
         assertEquals(playlistDAOMock.getPlaylists().size(), playlistsDTO.playlists.size());
     }
 
-    //TODO: make this work
+    //TODO: make this work and r210
     /**
      * createPlaylist()
      * */
@@ -204,7 +204,6 @@ public class PlaylistServiceTest {
         assertEquals(expectedStatuscode, response.getStatus());
     }
 
-    //TODO: fix this
     /**
      * editPlaylist()
      * */
