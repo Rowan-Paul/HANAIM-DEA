@@ -80,4 +80,62 @@ public class UserServiceTest {
         // Assert
         assertEquals(statuscodeExpected, response.getStatus());
     }
+
+    @Test
+    public void loginUserNoUserDTOTest() {
+        int statuscodeExpected = 400;
+
+        Response response = userService.loginUser(null);
+
+        assertEquals(statuscodeExpected, response.getStatus());
+    }
+
+    @Test
+    public void loginUserNoUserTest() {
+        int statuscodeExpected = 401;
+        final String username = "rowan";
+        User user = new User(username);
+        user.setPassword("password");
+
+        User returnedUser = new User(username);
+        returnedUser.setPassword("5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8");
+
+
+        UserDTO userDTO = new UserDTO();
+        userDTO.user = user.getUser();
+        userDTO.password = user.getPassword();
+
+        IUserDAO userDAOMock = mock(IUserDAO.class);
+        when(userDAOMock.getUser(user.getUser())).thenReturn(null);
+        userService.setUserDAO(userDAOMock);
+
+        Response response = userService.loginUser(userDTO);
+        TokenDTO tokenDTO = (TokenDTO) response.getEntity();
+
+        assertEquals(statuscodeExpected, response.getStatus());
+    }
+
+    @Test
+    public void loginUserNoTokenTest() {
+        int statuscodeExpected = 400;
+        final String username = "rowan";
+        User user = new User(username);
+        user.setPassword("password");
+
+        User returnedUser = new User(username);
+        returnedUser.setPassword("5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8");
+
+        UserDTO userDTO = new UserDTO();
+        userDTO.user = user.getUser();
+        userDTO.password = user.getPassword();
+
+        IUserDAO userDAOMock = mock(IUserDAO.class);
+        when(userDAOMock.getUser(user.getUser())).thenReturn(returnedUser);
+        when(userDAOMock.createToken(user.getUser())).thenReturn(null);
+        userService.setUserDAO(userDAOMock);
+
+        Response response = userService.loginUser(userDTO);
+
+        assertEquals(statuscodeExpected, response.getStatus());
+    }
 }

@@ -77,6 +77,23 @@ public class TrackServiceTest {
     }
 
     @Test
+    public void getTracksAlternativeTest() {
+        int expectedStatuscode = 200;
+        int expectedPlaylistId = 1;
+        TracklistDTO expectedTracklist = new TracklistDTO();
+        expectedTracklist.tracks = playlist3;
+        ArrayList<Track> inPlaylist = new ArrayList<>();
+
+        doReturn(inPlaylist).when(playlistDAOMock).getTracksFromPlaylist(expectedPlaylistId);
+        doReturn(playlist1).when(trackDAOMock).getTracks();
+        when(userDAOMock.verifyToken(token.getToken())).thenReturn(user);
+
+        Response response = trackService.getTracks(token.getToken(), expectedPlaylistId);
+
+        assertEquals(expectedStatuscode, response.getStatus());
+    }
+
+    @Test
     public void getTracksTokenNullTest() {
         int expectedStatuscode = 400;
         int expectedPlaylistId = 1;
