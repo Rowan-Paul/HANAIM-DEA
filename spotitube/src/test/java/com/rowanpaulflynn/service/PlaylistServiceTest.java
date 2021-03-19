@@ -8,6 +8,7 @@ import com.rowanpaulflynn.domain.Track;
 import com.rowanpaulflynn.domain.User;
 import com.rowanpaulflynn.service.dto.PlaylistDTO;
 import com.rowanpaulflynn.service.dto.PlaylistsDTO;
+import com.rowanpaulflynn.service.dto.TrackDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -229,7 +230,7 @@ public class PlaylistServiceTest {
         when(playlistDAOMock.editPlaylist(playlistid, playlist)).thenReturn(false);
         doReturn(expectedPlaylistsDTO).when(mockPlaylistService).getAllPlaylistsList(user);
 
-        Response response = mockPlaylistService.editPlaylist(playlistid, playlistDTO, token.getToken());
+        Response response = mockPlaylistService.editPlaylistTracks(playlistid, playlistDTO, token.getToken());
 
         assertEquals(expectedStatuscode, response.getStatus());
     }
@@ -239,7 +240,7 @@ public class PlaylistServiceTest {
         int expectedStatuscode = 400;
         int playlistid = 1;
 
-        Response response = mockPlaylistService.editPlaylist(playlistid, playlistDTO, null);
+        Response response = mockPlaylistService.editPlaylistTracks(playlistid, playlistDTO, null);
 
         assertEquals(expectedStatuscode, response.getStatus());
     }
@@ -252,7 +253,7 @@ public class PlaylistServiceTest {
         when(userDAOMock.verifyToken(token.getToken())).thenReturn(null);
         doReturn(expectedPlaylistsDTO).when(mockPlaylistService).getAllPlaylistsList(user);
 
-        Response response = mockPlaylistService.editPlaylist(playlistid, playlistDTO, token.getToken());
+        Response response = mockPlaylistService.editPlaylistTracks(playlistid, playlistDTO, token.getToken());
 
         assertEquals(expectedStatuscode, response.getStatus());
     }
@@ -331,7 +332,7 @@ public class PlaylistServiceTest {
 
         assertEquals(expectedStatuscode, response.getStatus());
     }
-    
+
     @Test
     public void deleteTrackInPlaylistFailedTest() {
         int expectedStatuscode = 400;
@@ -368,6 +369,72 @@ public class PlaylistServiceTest {
         doReturn(expectedPlaylistsDTO).when(mockPlaylistService).getAllPlaylistsList(user);
 
         Response response = mockPlaylistService.deleteTrackInPlaylist(playlistid, trackid, token.getToken());
+
+        assertEquals(expectedStatuscode, response.getStatus());
+    }
+
+    /**
+     * addTrackToPlaylist
+     * */
+    @Test
+    public void addTrackToPlaylistTest() {
+        int expectedStatuscode = 201;
+        int playlistid = 1;
+        int trackid = 2;
+        TrackDTO trackDTO = new TrackDTO();
+        trackDTO.id = trackid;
+
+        when(userDAOMock.verifyToken(token.getToken())).thenReturn(user);
+        when(playlistDAOMock.addTrackToPlaylist(playlistid,trackid)).thenReturn(true);
+        when(playlistDAOMock.getTracksFromPlaylist(playlistid)).thenReturn(playlist1);
+
+        Response response = mockPlaylistService.addTrackToPlaylist(playlistid, token.getToken(), trackDTO);
+        ArrayList<Track> responseTracks = (ArrayList<Track>) response.getEntity();
+
+        assertEquals(expectedStatuscode, response.getStatus());
+        assertEquals(playlist1.get(0).getTitle(), responseTracks.get(0).getTitle());
+    }
+
+    @Test
+    public void addTrackToPlaylistFailedTest() {
+        int expectedStatuscode = 400;
+        int playlistid = 1;
+        int trackid = 2;
+        TrackDTO trackDTO = new TrackDTO();
+        trackDTO.id = trackid;
+
+        when(userDAOMock.verifyToken(token.getToken())).thenReturn(user);
+        when(playlistDAOMock.addTrackToPlaylist(playlistid,trackid)).thenReturn(false);
+
+        Response response = mockPlaylistService.addTrackToPlaylist(playlistid, token.getToken(), trackDTO);
+
+        assertEquals(expectedStatuscode, response.getStatus());
+    }
+
+    @Test
+    public void addTrackToPlaylistNoTokenTest() {
+        int expectedStatuscode = 400;
+        int playlistid = 1;
+        int trackid = 2;
+        TrackDTO trackDTO = new TrackDTO();
+        trackDTO.id = trackid;
+
+        Response response = mockPlaylistService.addTrackToPlaylist(playlistid, null, trackDTO);
+
+        assertEquals(expectedStatuscode, response.getStatus());
+    }
+
+    @Test
+    public void addTrackToPlaylistNoUserTest() {
+        int expectedStatuscode = 401;
+        int playlistid = 1;
+        int trackid = 2;
+        TrackDTO trackDTO = new TrackDTO();
+        trackDTO.id = trackid;
+
+        when(userDAOMock.verifyToken(token.getToken())).thenReturn(null);
+
+        Response response = mockPlaylistService.addTrackToPlaylist(playlistid, token.getToken(), trackDTO);
 
         assertEquals(expectedStatuscode, response.getStatus());
     }

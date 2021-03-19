@@ -99,7 +99,7 @@ public class PlaylistService {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response editPlaylist(@PathParam("id") int playlistid, PlaylistDTO newPlaylistDTO, @QueryParam("token") String token) {
+    public Response editPlaylistTracks(@PathParam("id") int playlistid, PlaylistDTO newPlaylistDTO, @QueryParam("token") String token) {
         if (token == null || playlistid < 1 || newPlaylistDTO == null || token == null) {
             return Response.status(400).build();
         }
@@ -165,7 +165,7 @@ public class PlaylistService {
     @Path("/{playlistid}/tracks")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response editPlaylist(@PathParam("playlistid") int playlistid, @QueryParam("token") String token, TrackDTO trackDTO) {
+    public Response addTrackToPlaylist(@PathParam("playlistid") int playlistid, @QueryParam("token") String token, TrackDTO trackDTO) {
         if (token == null || playlistid < 1 || trackDTO == null) {
             return Response.status(400).build();
         }
