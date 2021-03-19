@@ -9,7 +9,7 @@ public class Track {
     private int playcount;
     private String publicationDate;
     private String description;
-    private Boolean offlineAvailable;
+    private boolean offlineAvailable;
 
     public Track(int id, String title, String performer) {
         this.id = id;
@@ -81,7 +81,7 @@ public class Track {
         this.description = description;
     }
 
-    public Boolean getOfflineAvailable() {
+    public boolean getOfflineAvailable() {
         return offlineAvailable;
     }
 

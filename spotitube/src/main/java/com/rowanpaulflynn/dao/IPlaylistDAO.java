@@ -10,11 +10,11 @@ public interface IPlaylistDAO {
     int calculatePlaylistLength(ArrayList<Track> tracks);
     ArrayList<Track> getTracksFromPlaylist(int playlistid);
     Track getTrackInfo(int track);
-    Boolean deletePlaylist(int playlistid);
-    Boolean createPlaylist(Playlist playlist, String owner);
-    Boolean addTrackToPlaylist(int playlistid, int trackid);
+    boolean deletePlaylist(int playlistid);
+    boolean createPlaylist(Playlist playlist, String owner);
+    boolean addTrackToPlaylist(int playlistid, int trackid);
     int getPlaylistIdFromName(String playlistname);
-    Boolean editPlaylist(int playlistid, Playlist playlist);
-    Boolean deleteTracksInPlaylist(int playlistid);
-    Boolean deleteTrackInPlaylist(int playlistid, int trackid);
+    boolean editPlaylist(int playlistid, Playlist playlist);
+    boolean deleteTracksInPlaylist(int playlistid);
+    boolean deleteTrackInPlaylist(int playlistid, int trackid);
 }

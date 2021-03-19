@@ -2,6 +2,7 @@ package com.rowanpaulflynn.dao;
 
 import com.rowanpaulflynn.domain.Playlist;
 import com.rowanpaulflynn.domain.Track;
+import com.rowanpaulflynn.exceptions.InternalServerError;
 
 import javax.annotation.Resource;
 import javax.enterprise.inject.Default;
@@ -14,14 +15,13 @@ import java.util.ArrayList;
 
 //TODO: move certain track related functions to TrackDAO
 //TODO: add offlineAvailable or something
-//TODO: add custom exceptions
 @Default
 public class PlaylistDAO implements IPlaylistDAO {
     @Resource(name = "jdbc/spotitube")
     DataSource dataSource;
 
     @Override
-    public ArrayList<Playlist> getPlaylists() {
+    public ArrayList<Playlist> getPlaylists() throws InternalServerError {
         String sql = "select * from playlists";
 
         try (Connection connection = dataSource.getConnection()) {
@@ -41,11 +41,9 @@ public class PlaylistDAO implements IPlaylistDAO {
             }
 
             return playlists;
-
         } catch (SQLException exception) {
-            exception.printStackTrace();
+            throw new InternalServerError(exception.toString());
         }
-        return null;
     }
 
     @Override
@@ -60,7 +58,7 @@ public class PlaylistDAO implements IPlaylistDAO {
     }
 
     @Override
-    public ArrayList<Track> getTracksFromPlaylist(int playlistid) {
+    public ArrayList<Track> getTracksFromPlaylist(int playlistid) throws InternalServerError {
         String sql = "select * from playlisttracks where playlistid = ?";
 
         try (Connection connection = dataSource.getConnection()) {
@@ -75,17 +73,15 @@ public class PlaylistDAO implements IPlaylistDAO {
             }
 
             return tracks;
-
         } catch (SQLException exception) {
-            exception.printStackTrace();
+            throw new InternalServerError(exception.toString());
         }
-        return null;
     }
 
 
 
     @Override
-    public Track getTrackInfo(int trackid) {
+    public Track getTrackInfo(int trackid) throws InternalServerError {
         String sql = "select * from tracks where id = ?";
 
         try (Connection connection = dataSource.getConnection()) {
@@ -106,14 +102,14 @@ public class PlaylistDAO implements IPlaylistDAO {
 
                 return track;
             }
+            return null;
         } catch (SQLException exception) {
-            exception.printStackTrace();
+            throw new InternalServerError(exception.toString());
         }
-        return null;
     }
 
     @Override
-    public Boolean deletePlaylist(int playlistid) {
+    public boolean deletePlaylist(int playlistid) throws InternalServerError {
         String sql = "delete from playlists where id = ?";
 
         try (Connection connection = dataSource.getConnection()) {
@@ -125,15 +121,14 @@ public class PlaylistDAO implements IPlaylistDAO {
                 return true;
             }
 
+            return false;
         } catch (SQLException exception) {
-            exception.printStackTrace();
+            throw new InternalServerError(exception.toString());
         }
-
-        return false;
     }
 
     @Override
-    public Boolean createPlaylist(Playlist playlist, String owner) {
+    public boolean createPlaylist(Playlist playlist, String owner) throws InternalServerError {
         String sql = "insert into playlists (`name`, `owner`) values (?, ?)";
 
         try (Connection connection = dataSource.getConnection()) {
@@ -153,16 +148,13 @@ public class PlaylistDAO implements IPlaylistDAO {
             }
 
             return true;
-
         } catch (SQLException exception) {
-            exception.printStackTrace();
+            throw new InternalServerError(exception.toString());
         }
-
-        return false;
     }
 
     @Override
-    public int getPlaylistIdFromName(String playlistname) {
+    public int getPlaylistIdFromName(String playlistname) throws InternalServerError {
         String sql = "select * from playlists where name = ?";
 
         try (Connection connection = dataSource.getConnection()) {
@@ -174,15 +166,14 @@ public class PlaylistDAO implements IPlaylistDAO {
                 return resultSet.getInt("id");
             }
 
+            return 0;
         } catch (SQLException exception) {
-            exception.printStackTrace();
+            throw new InternalServerError(exception.toString());
         }
-
-        return 0;
     }
 
     @Override
-    public Boolean addTrackToPlaylist(int playlistid, int trackid) {
+    public boolean addTrackToPlaylist(int playlistid, int trackid) throws InternalServerError {
         String sql = "insert into playlisttracks (`playlistid`, `trackid`) values (?, ?)";
 
         try (Connection connection = dataSource.getConnection()) {
@@ -194,14 +185,12 @@ public class PlaylistDAO implements IPlaylistDAO {
             return true;
 
         } catch (SQLException exception) {
-            exception.printStackTrace();
+            throw new InternalServerError(exception.toString());
         }
-
-        return false;
     }
 
     @Override
-    public Boolean editPlaylist(int playlistid, Playlist playlist) {
+    public boolean editPlaylist(int playlistid, Playlist playlist) throws InternalServerError {
         String sql = "update playlists set name = ? where id = ?";
 
         try (Connection connection = dataSource.getConnection()) {
@@ -220,14 +209,12 @@ public class PlaylistDAO implements IPlaylistDAO {
             }
             return true;
         } catch (SQLException exception) {
-            exception.printStackTrace();
+            throw new InternalServerError(exception.toString());
         }
-
-        return false;
     }
 
     @Override
-    public Boolean deleteTracksInPlaylist(int playlistid) {
+    public boolean deleteTracksInPlaylist(int playlistid) throws InternalServerError {
         String sql = "delete from playlisttracks where playlistid = ?";
 
         try (Connection connection = dataSource.getConnection()) {
@@ -238,14 +225,12 @@ public class PlaylistDAO implements IPlaylistDAO {
             return true;
 
         } catch (SQLException exception) {
-            exception.printStackTrace();
+            throw new InternalServerError(exception.toString());
         }
-
-        return false;
     }
 
     @Override
-    public Boolean deleteTrackInPlaylist(int playlistid, int trackid) {
+    public boolean deleteTrackInPlaylist(int playlistid, int trackid) throws InternalServerError {
         String sql = "delete from playlisttracks where playlistid = ? and trackid = ?";
 
         try (Connection connection = dataSource.getConnection()) {
@@ -257,10 +242,8 @@ public class PlaylistDAO implements IPlaylistDAO {
             return true;
 
         } catch (SQLException exception) {
-            exception.printStackTrace();
+            throw new InternalServerError(exception.toString());
         }
-
-        return false;
     }
 
     public void setDataSource(DataSource dataSource) {
