@@ -29,7 +29,6 @@ public class PlaylistService {
         if(token == null) {
             return Response.status(400).build();
         }
-
         User user = userDAO.verifyToken(token);
         if (user == null) {
             return Response.status(401).build();
