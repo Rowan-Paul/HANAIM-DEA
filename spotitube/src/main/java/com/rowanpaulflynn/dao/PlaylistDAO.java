@@ -135,9 +135,9 @@ public class PlaylistDAO implements IPlaylistDAO {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, playlist.getName());
             statement.setString(2, owner);
-            int resultSet = statement.executeUpdate();
+            statement.executeUpdate();
 
-            if(playlist.getTracks().size() > 0) {
+            if(playlist.getTracks() != null) {
                 int playlistId = getPlaylistIdFromName(playlist.getName());
 
                 ArrayList<Track> tracks = playlist.getTracks();
