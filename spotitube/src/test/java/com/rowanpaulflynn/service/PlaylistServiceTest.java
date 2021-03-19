@@ -6,6 +6,7 @@ import com.rowanpaulflynn.domain.Playlist;
 import com.rowanpaulflynn.domain.Token;
 import com.rowanpaulflynn.domain.Track;
 import com.rowanpaulflynn.domain.User;
+import com.rowanpaulflynn.service.dto.PlaylistDTO;
 import com.rowanpaulflynn.service.dto.PlaylistsDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,17 +19,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class PlaylistServiceTest {
-    IPlaylistDAO playlistDAOMock = mock(IPlaylistDAO.class);
-    IUserDAO userDAOMock = mock(IUserDAO.class);
-    Token token = new Token("rowan");
-    User user = new User("rowan");
+    private IPlaylistDAO playlistDAOMock = mock(IPlaylistDAO.class);
+    private IUserDAO userDAOMock = mock(IUserDAO.class);
+    private Token token = new Token("rowan");
+    private User user = new User("rowan");
+    private PlaylistService playlistService;
+    private PlaylistService mockPlaylistService;
+
     ArrayList<Track> playlist1;
     ArrayList<Track> playlist2;
     ArrayList<Track> playlist3;
     PlaylistsDTO expectedPlaylistsDTO;
     ArrayList<Playlist> playlists;
-    private PlaylistService playlistService;
-    private PlaylistService mockPlaylistService;
 
     @BeforeEach
     public void beforeEachSetUp() {
@@ -37,6 +39,7 @@ public class PlaylistServiceTest {
         mockPlaylistService.setPlaylistDAO(playlistDAOMock);
         mockPlaylistService.setUserDAO(userDAOMock);
 
+        // PlaylistsDTO expectedPlaylistsDTO
         playlist1 = new ArrayList<>();
         playlist2 = new ArrayList<>();
         playlist3 = new ArrayList<>();
@@ -67,7 +70,7 @@ public class PlaylistServiceTest {
         expectedPlaylistsDTO.playlists.add(playlist2);
         expectedPlaylistsDTO.playlists.add(playlist3);
 
-
+        // Playlists playlist
         playlists = new ArrayList<>();
         Playlist pl1 = new Playlist("new playlist",
                 user.getUser());
@@ -128,5 +131,28 @@ public class PlaylistServiceTest {
 
         assertEquals(playlistDAOMock.getPlaylists().size(), playlistsDTO.playlists.size());
     }
+
+    //TODO: make this work
+//    @Test
+//    public void createPlaylistTest() {
+//        int expectedStatusCode = 200;
+//        PlaylistDTO playlistDTO = new PlaylistDTO();
+//        playlistDTO.name = "playlistname";
+//        playlistDTO.owner = false;
+//        playlistDTO.id = -1;
+//
+//        Playlist playlist = new Playlist(playlistDTO.name, user.getUser());
+//        playlist.setId(playlistDTO.id);
+//        playlist.setTracks(playlistDTO.tracks);
+//        playlist.setLength(playlistDTO.length);
+//
+//        when(userDAOMock.verifyToken(token.getToken())).thenReturn(user);
+//        doReturn(true).when(playlistDAOMock).createPlaylist(playlist, user.getUser());
+//        doReturn(expectedPlaylistsDTO).when(mockPlaylistService).getAllPlaylistsList(user);
+//
+//        Response response = mockPlaylistService.createPlaylist(playlistDTO,token.getToken());
+//
+//        assertEquals(expectedStatusCode, response.getStatus());
+//    }
 }
 
