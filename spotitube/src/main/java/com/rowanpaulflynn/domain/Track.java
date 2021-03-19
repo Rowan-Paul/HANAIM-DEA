@@ -37,20 +37,40 @@ public class Track {
         this.duration = duration;
     }
 
+    public String getAlbum() {
+        return album;
+    }
+
     public void setAlbum(String album) {
         this.album = album;
+    }
+
+    public int getPlaycount() {
+        return playcount;
     }
 
     public void setPlaycount(int playcount) {
         this.playcount = playcount;
     }
 
+    public String getPublicationDate() {
+        return publicationDate;
+    }
+
     public void setPublicationDate(String publicationDate) {
         this.publicationDate = publicationDate;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public boolean getOfflineAvailable() {
+        return offlineAvailable;
     }
 
     public void setOfflineAvailable(boolean offlineAvailable) {

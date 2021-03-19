@@ -394,6 +394,11 @@ public class PlaylistServiceTest {
 
         assertEquals(expectedStatuscode, response.getStatus());
         assertEquals(playlist1.get(0).getTitle(), responseTracks.get(0).getTitle());
+        assertEquals(playlist1.get(0).getAlbum(), responseTracks.get(0).getAlbum());
+        assertEquals(playlist1.get(0).getPlaycount(), responseTracks.get(0).getPlaycount());
+        assertEquals(playlist1.get(0).getDescription(), responseTracks.get(0).getDescription());
+        assertEquals(playlist1.get(0).getOfflineAvailable(), responseTracks.get(0).getOfflineAvailable());
+        assertEquals(playlist1.get(0).getPublicationDate(), responseTracks.get(0).getPublicationDate());
     }
 
     @Test

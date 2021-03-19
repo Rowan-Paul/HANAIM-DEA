@@ -3,7 +3,6 @@ package com.rowanpaulflynn.service;
 import com.rowanpaulflynn.dao.IPlaylistDAO;
 import com.rowanpaulflynn.dao.ITrackDAO;
 import com.rowanpaulflynn.dao.IUserDAO;
-import com.rowanpaulflynn.domain.Playlist;
 import com.rowanpaulflynn.domain.Token;
 import com.rowanpaulflynn.domain.Track;
 import com.rowanpaulflynn.domain.User;
@@ -58,6 +57,9 @@ public class TrackServiceTest {
         playlist3.add(tk2);
     }
 
+    /**
+     * getTracks()
+     * */
     @Test
     public void getTracksTest() {
         int expectedStatuscode = 200;
