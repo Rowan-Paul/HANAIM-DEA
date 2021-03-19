@@ -331,6 +331,21 @@ public class PlaylistServiceTest {
 
         assertEquals(expectedStatuscode, response.getStatus());
     }
+    
+    @Test
+    public void deleteTrackInPlaylistFailedTest() {
+        int expectedStatuscode = 400;
+        int playlistid = 1;
+        int trackid = 2;
+
+        when(userDAOMock.verifyToken(token.getToken())).thenReturn(user);
+        when(playlistDAOMock.deleteTrackInPlaylist(playlistid,trackid)).thenReturn(false);
+        doReturn(expectedPlaylistsDTO).when(mockPlaylistService).getAllPlaylistsList(user);
+
+        Response response = mockPlaylistService.deleteTrackInPlaylist(playlistid, trackid, token.getToken());
+
+        assertEquals(expectedStatuscode, response.getStatus());
+    }
 
     @Test
     public void deleteTrackInPlaylistNoTokenTest() {

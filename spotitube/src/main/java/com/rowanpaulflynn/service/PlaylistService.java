@@ -158,7 +158,6 @@ public class PlaylistService {
             //TODO: fix deleting last track giving 400
             return Response.status(200).entity(tracks).build();
         }
-
         return Response.status(400).build();
     }
 
