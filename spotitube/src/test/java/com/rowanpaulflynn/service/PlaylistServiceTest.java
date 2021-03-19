@@ -2,6 +2,7 @@ package com.rowanpaulflynn.service;
 
 import com.rowanpaulflynn.dao.IPlaylistDAO;
 import com.rowanpaulflynn.dao.IUserDAO;
+import com.rowanpaulflynn.domain.Playlist;
 import com.rowanpaulflynn.domain.Token;
 import com.rowanpaulflynn.domain.Track;
 import com.rowanpaulflynn.domain.User;
@@ -17,17 +18,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class PlaylistServiceTest {
-    private PlaylistService playlistService;
-    private PlaylistService mockPlaylistService;
     IPlaylistDAO playlistDAOMock = mock(IPlaylistDAO.class);
     IUserDAO userDAOMock = mock(IUserDAO.class);
     Token token = new Token("rowan");
     User user = new User("rowan");
-
     ArrayList<Track> playlist1;
     ArrayList<Track> playlist2;
     ArrayList<Track> playlist3;
     PlaylistsDTO expectedPlaylistsDTO;
+    ArrayList<Playlist> playlists;
+    private PlaylistService playlistService;
+    private PlaylistService mockPlaylistService;
 
     @BeforeEach
     public void beforeEachSetUp() {
@@ -41,7 +42,7 @@ public class PlaylistServiceTest {
         playlist3 = new ArrayList<>();
         expectedPlaylistsDTO = new PlaylistsDTO();
 
-        Track tk1 = new Track(1,"the 1","Taylor Swift");
+        Track tk1 = new Track(1, "the 1", "Taylor Swift");
         tk1.setAlbum("folklore");
         tk1.setDuration(200);
         tk1.setPlaycount(0);
@@ -65,6 +66,22 @@ public class PlaylistServiceTest {
         expectedPlaylistsDTO.playlists.add(playlist1);
         expectedPlaylistsDTO.playlists.add(playlist2);
         expectedPlaylistsDTO.playlists.add(playlist3);
+
+
+        playlists = new ArrayList<>();
+        Playlist pl1 = new Playlist("new playlist",
+                user.getUser());
+        pl1.setId(1);
+        pl1.setTracks(playlist1);
+        pl1.setLength(460);
+        playlists.add(pl1);
+
+        Playlist pl2 = new Playlist("another",
+                "notme");
+        pl2.setId(1);
+        pl2.setTracks(playlist1);
+        pl2.setLength(460);
+        playlists.add(pl2);
     }
 
     @Test
@@ -80,4 +97,36 @@ public class PlaylistServiceTest {
         assertEquals(expectedStatuscode, response.getStatus());
         assertEquals(expectedPlaylistsDTO, responsePlaylistsDTO);
     }
+
+    @Test
+    public void getAllPlaylistsNoTokenTest() {
+        int expectedStatuscode = 400;
+
+        Response response = mockPlaylistService.getAllPlaylists(null);
+
+        assertEquals(expectedStatuscode, response.getStatus());
+    }
+
+    @Test
+    public void getAllPlaylistsNoUserTest() {
+        int expectedStatuscode = 401;
+
+        when(userDAOMock.verifyToken(token.getToken())).thenReturn(null);
+        doReturn(expectedPlaylistsDTO).when(mockPlaylistService).getAllPlaylistsList(user);
+
+        Response response = mockPlaylistService.getAllPlaylists(token.getToken());
+
+        assertEquals(expectedStatuscode, response.getStatus());
+    }
+
+    @Test
+    public void getAllPlaylistsListTest() {
+        when(playlistDAOMock.getPlaylists()).thenReturn(playlists);
+        when(userDAOMock.verifyToken(token.getToken())).thenReturn(user);
+
+        PlaylistsDTO playlistsDTO = mockPlaylistService.getAllPlaylistsList(user);
+
+        assertEquals(playlistDAOMock.getPlaylists().size(), playlistsDTO.playlists.size());
+    }
 }
+

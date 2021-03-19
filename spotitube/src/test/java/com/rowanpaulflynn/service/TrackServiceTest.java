@@ -3,6 +3,7 @@ package com.rowanpaulflynn.service;
 import com.rowanpaulflynn.dao.IPlaylistDAO;
 import com.rowanpaulflynn.dao.ITrackDAO;
 import com.rowanpaulflynn.dao.IUserDAO;
+import com.rowanpaulflynn.domain.Playlist;
 import com.rowanpaulflynn.domain.Token;
 import com.rowanpaulflynn.domain.Track;
 import com.rowanpaulflynn.domain.User;
@@ -35,7 +36,6 @@ public class TrackServiceTest {
         trackService.setTrackDAO(trackDAOMock);
         trackService.setUserDAO(userDAOMock);
         trackService.setPlaylistDAO(playlistDAOMock);
-
 
         Track tk1 = new Track(1,"the 1","Taylor Swift");
         tk1.setAlbum("folklore");
@@ -85,11 +85,21 @@ public class TrackServiceTest {
         doReturn(playlist1).when(trackDAOMock).getTracks();
         when(userDAOMock.verifyToken(token.getToken())).thenReturn(user);
 
-        trackService.setTrackDAO(trackDAOMock);
-        trackService.setUserDAO(userDAOMock);
-        trackService.setPlaylistDAO(playlistDAOMock);
-
         Response response = trackService.getTracks(null, expectedPlaylistId);
+
+        assertEquals(expectedStatuscode, response.getStatus());
+    }
+
+    @Test
+    public void getTracksNoUserTest() {
+        int expectedStatuscode = 401;
+        int expectedPlaylistId = 1;
+
+        doReturn(playlist2).when(playlistDAOMock).getTracksFromPlaylist(expectedPlaylistId);
+        doReturn(playlist1).when(trackDAOMock).getTracks();
+        when(userDAOMock.verifyToken(token.getToken())).thenReturn(null);
+
+        Response response = trackService.getTracks(token.getToken(), expectedPlaylistId);
 
         assertEquals(expectedStatuscode, response.getStatus());
     }
