@@ -2,6 +2,7 @@ package com.rowanpaulflynn.dao;
 
 import com.rowanpaulflynn.dao.TrackDAO;
 import com.rowanpaulflynn.domain.Track;
+import com.rowanpaulflynn.exceptions.InternalServerError;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -9,6 +10,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -63,6 +65,24 @@ public class TrackDAOTest {
             assertEquals(expectedPerformer, tracks.get(0).getPerformer());
         } catch (Exception e) {
             fail(e);
+            e.getMessage();
+        }
+    }
+
+    @Test
+    public void getTracksTrowsErrorTest() {
+        try {
+            final String expectedSQL = "select * from tracks";
+
+            when(dataSource.getConnection()).thenReturn(connection);
+            when(connection.prepareStatement(expectedSQL)).thenReturn(preparedStatement);
+            when(preparedStatement.executeQuery()).thenReturn(resultSet);
+            when(resultSet.next()).thenThrow(new SQLException());
+
+            assertThrows(InternalServerError.class, () -> {
+                trackDAO.getTracks();
+            });
+        } catch (Exception e) {
             e.getMessage();
         }
     }

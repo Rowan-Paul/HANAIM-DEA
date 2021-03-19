@@ -69,7 +69,7 @@ public class UserDAO implements IUserDAO {
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()){
-                User user = new User(resultSet.getString("user"));
+                User user =     new User(resultSet.getString("user"));
 
                 return user;
             }

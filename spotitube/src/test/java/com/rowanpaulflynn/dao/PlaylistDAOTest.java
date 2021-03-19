@@ -24,9 +24,9 @@ public class PlaylistDAOTest {
     private Connection connection;
     private PreparedStatement preparedStatement;
     private ResultSet resultSet;
-    private ArrayList<Track> expectedTracks = new ArrayList<>();
-    private Track expectedTrack1 = new Track(1,"the 1","Taylor Swift");
-    private Track expectedTrack2 = new Track(2,"coney island","Taylor Swift");
+    private final ArrayList<Track> expectedTracks = new ArrayList<>();
+    private final Track expectedTrack1 = new Track(1,"the 1","Taylor Swift");
+    private final Track expectedTrack2 = new Track(2,"coney island","Taylor Swift");
 
     @BeforeEach
     public void setup() {
@@ -45,6 +45,9 @@ public class PlaylistDAOTest {
         expectedTracks.add(expectedTrack2);
     }
 
+    /**
+     * getPlaylists()
+     * */
     @Test
     public void getPlaylistsTest() {
         try {
@@ -84,7 +87,7 @@ public class PlaylistDAOTest {
     }
 
     @Test
-    public void getAllPlaylistsTrowsError() {
+    public void getAllPlaylistsTrowsErrorTest() {
         try {
             final String expectedSQL = "select * from playlists";
 
@@ -101,6 +104,9 @@ public class PlaylistDAOTest {
         }
     }
 
+    /**
+     * calculatePlaylistLength()
+     * */
     @Test
     public void calculatePlaylistLengthTest() {
         try {
@@ -115,6 +121,9 @@ public class PlaylistDAOTest {
         }
     }
 
+    /**
+     * getTracksFromPlaylist()
+     * */
     @Test
     public void getTracksFromPlaylistTest() {
         try {
@@ -145,6 +154,28 @@ public class PlaylistDAOTest {
     }
 
     @Test
+    public void getTracksFromPlaylistTrowsErrorTest() {
+        try {
+            final String expectedSQL = "select * from playlisttracks where playlistid = ?";
+            final int expectedId = 1;
+
+            when(dataSource.getConnection()).thenReturn(connection);
+            when(connection.prepareStatement(expectedSQL)).thenReturn(preparedStatement);
+            when(preparedStatement.executeQuery()).thenReturn(resultSet);
+            when(resultSet.next()).thenThrow(new SQLException());
+
+            assertThrows(InternalServerError.class, () -> {
+                mockPlaylistDAO.getTracksFromPlaylist(expectedId);
+            });
+        } catch (Exception e) {
+            e.getMessage();
+        }
+    }
+
+    /**
+     * getTracksInfo()
+     * */
+    @Test
     public void getTracksInfoTest() {
         try {
             final String expectedSQL = "select * from tracks where id = ?";
@@ -174,6 +205,50 @@ public class PlaylistDAOTest {
     }
 
     @Test
+    public void getTracksInfoFailedTest() {
+        try {
+            final String expectedSQL = "select * from tracks where id = ?";
+
+            when(dataSource.getConnection()).thenReturn(connection);
+            when(connection.prepareStatement(expectedSQL)).thenReturn(preparedStatement);
+            when(preparedStatement.executeQuery()).thenReturn(resultSet);
+            when(resultSet.next()).thenReturn(false);
+
+            Track track = mockPlaylistDAO.getTrackInfo(expectedTrack1.getId());
+
+            verify(dataSource).getConnection();
+            verify(connection).prepareStatement(expectedSQL);
+            verify(preparedStatement).setInt(1, expectedTrack1.getId());
+
+            assertNull(track);
+        } catch (Exception e) {
+            fail(e);
+            e.getMessage();
+        }
+    }
+
+    @Test
+    public void getTracksInfoTrowsErrorTest() {
+        try {
+            final String expectedSQL = "select * from tracks where id = ?";
+
+            when(dataSource.getConnection()).thenReturn(connection);
+            when(connection.prepareStatement(expectedSQL)).thenReturn(preparedStatement);
+            when(preparedStatement.executeQuery()).thenReturn(resultSet);
+            when(resultSet.next()).thenThrow(new SQLException());
+
+            assertThrows(InternalServerError.class, () -> {
+                mockPlaylistDAO.getTrackInfo(expectedTrack1.getId());
+            });
+        } catch (Exception e) {
+            e.getMessage();
+        }
+    }
+
+    /**
+     * deletePlaylist()
+     * */
+    @Test
     public void deletePlaylistTest() {
         try {
             final String expectedSQL = "delete from playlists where id = ?";
@@ -198,6 +273,52 @@ public class PlaylistDAOTest {
         }
     }
 
+    @Test
+    public void deletePlaylistFailedTest() {
+        try {
+            final String expectedSQL = "delete from playlists where id = ?";
+            final int expectedId = 1;
+
+            when(dataSource.getConnection()).thenReturn(connection);
+            when(connection.prepareStatement(expectedSQL)).thenReturn(preparedStatement);
+            when(preparedStatement.executeUpdate()).thenReturn(1);
+
+            Mockito.doReturn(false).when(mockPlaylistDAO).deleteTracksInPlaylist(expectedId);
+
+            boolean deletePlaylist = mockPlaylistDAO.deletePlaylist(expectedId);
+
+            verify(dataSource).getConnection();
+            verify(connection).prepareStatement(expectedSQL);
+            verify(preparedStatement).setInt(1, expectedId);
+
+            assertFalse(deletePlaylist);
+        } catch (Exception e) {
+            fail(e);
+            e.getMessage();
+        }
+    }
+
+    @Test
+    public void deletePlaylistTrowsErrorTest() {
+        try {
+            final String expectedSQL = "delete from playlists where id = ?";
+            final int expectedId = 1;
+
+            when(dataSource.getConnection()).thenReturn(connection);
+            when(connection.prepareStatement(expectedSQL)).thenReturn(preparedStatement);
+            when(preparedStatement.executeUpdate()).thenThrow(new SQLException());
+
+            assertThrows(InternalServerError.class, () -> {
+                mockPlaylistDAO.deletePlaylist(expectedId);
+            });
+        } catch (Exception e) {
+            e.getMessage();
+        }
+    }
+
+    /**
+     * createPlaylist()
+     * */
     @Test
     public void createPlaylistTest() {
         try {
@@ -231,6 +352,30 @@ public class PlaylistDAOTest {
     }
 
     @Test
+    public void createPlaylistTrowsErrorTest() {
+        try {
+            final String expectedSQL = "insert into playlists (`name`, `owner`) values (?, ?)";
+            final String expectedOwner = "rowan";
+            final String expectedName = "newplaylist";
+            Playlist expectedPlaylist = new Playlist(expectedName,expectedOwner);
+            expectedPlaylist.setTracks(expectedTracks);
+
+            when(dataSource.getConnection()).thenReturn(connection);
+            when(connection.prepareStatement(expectedSQL)).thenReturn(preparedStatement);
+            when(preparedStatement.executeUpdate()).thenThrow(new SQLException());
+
+            assertThrows(InternalServerError.class, () -> {
+                mockPlaylistDAO.createPlaylist(expectedPlaylist,expectedOwner);
+            });
+        } catch (Exception e) {
+            e.getMessage();
+        }
+    }
+
+    /**
+     * getPlaylistIdFromName()
+     * */
+    @Test
     public void getPlaylistIdFromNameTest() {
         try {
             final String expectedSQL = "select * from playlists where name = ?";
@@ -258,6 +403,56 @@ public class PlaylistDAOTest {
     }
 
     @Test
+    public void getPlaylistIdFromNameFailedTest() {
+        try {
+            final String expectedSQL = "select * from playlists where name = ?";
+            final int expectedId = 0;
+            final String expectedName = "playlist";
+
+            when(dataSource.getConnection()).thenReturn(connection);
+            when(connection.prepareStatement(expectedSQL)).thenReturn(preparedStatement);
+            when(preparedStatement.executeQuery()).thenReturn(resultSet);
+            when(resultSet.next()).thenReturn(false);
+
+            when(resultSet.getInt("id")).thenReturn(expectedId);
+
+            int playlistid = mockPlaylistDAO.getPlaylistIdFromName(expectedName);
+
+            verify(dataSource).getConnection();
+            verify(connection).prepareStatement(expectedSQL);
+            verify(preparedStatement).setString(1, expectedName);
+
+            assertEquals(expectedId, playlistid);
+        } catch (Exception e) {
+            fail(e);
+            e.getMessage();
+        }
+    }
+
+    @Test
+    public void getPlaylistIdFromNameTrowsErrorTest() {
+        try {
+            final String expectedSQL = "select * from playlists where name = ?";
+            final String expectedName = "playlist";
+
+            when(dataSource.getConnection()).thenReturn(connection);
+            when(connection.prepareStatement(expectedSQL)).thenReturn(preparedStatement);
+            when(preparedStatement.executeUpdate()).thenThrow(new SQLException());
+            when(preparedStatement.executeQuery()).thenReturn(resultSet);
+            when(resultSet.next()).thenThrow(new SQLException());
+
+            assertThrows(InternalServerError.class, () -> {
+                mockPlaylistDAO.getPlaylistIdFromName(expectedName);
+            });
+        } catch (Exception e) {
+            e.getMessage();
+        }
+    }
+
+    /**
+     * addTrackToPlaylist()
+     * */
+    @Test
     public void addTrackToPlaylistTest() {
         try {
             final String expectedSQL = "insert into playlisttracks (`playlistid`, `trackid`) values (?, ?)";
@@ -282,6 +477,29 @@ public class PlaylistDAOTest {
         }
     }
 
+    //TODO: get it to show up on line coverage
+    @Test
+    public void addTrackToPlaylistTrowsErrorTest() {
+        try {
+            final String expectedSQL = "insert into playlisttracks (`playlistid`, `trackid`) values (?, ?)";
+            int expectedPlaylistId = 1;
+            int expectedTrackId = 2;
+
+            when(dataSource.getConnection()).thenReturn(connection);
+            when(connection.prepareStatement(expectedSQL)).thenReturn(preparedStatement);
+            when(preparedStatement.executeUpdate()).thenThrow(new SQLException());
+
+            assertThrows(InternalServerError.class, () -> {
+                mockPlaylistDAO.addTrackToPlaylist(expectedPlaylistId, expectedTrackId);
+            });
+        } catch (Exception e) {
+            e.getMessage();
+        }
+    }
+
+    /**
+     * editPlaylist()
+     * */
     @Test
     public void editPlaylistTest() {
         try {
@@ -317,6 +535,31 @@ public class PlaylistDAOTest {
     }
 
     @Test
+    public void editPlaylistTrowsErrorTest() {
+        try {
+            final String expectedSQL = "update playlists set name = ? where id = ?";
+            final int expectedId = 1;
+            final String expectedOwner = "rowan";
+            final String expectedName = "newplaylist";
+            Playlist expectedPlaylist = new Playlist(expectedName,expectedOwner);
+            expectedPlaylist.setTracks(expectedTracks);
+
+            when(dataSource.getConnection()).thenReturn(connection);
+            when(connection.prepareStatement(expectedSQL)).thenReturn(preparedStatement);
+            when(preparedStatement.executeUpdate()).thenThrow(new SQLException());
+
+            assertThrows(InternalServerError.class, () -> {
+                mockPlaylistDAO.editPlaylist(expectedId,expectedPlaylist);
+            });
+        } catch (Exception e) {
+            e.getMessage();
+        }
+    }
+
+    /**
+     * deleteTracksInPlaylist()
+     * */
+    @Test
     public void deleteTracksInPlaylistTest() {
         try {
             final String expectedSQL = "delete from playlisttracks where playlistid = ?";
@@ -340,6 +583,27 @@ public class PlaylistDAOTest {
     }
 
     @Test
+    public void deleteTracksInPlaylistTrowsErrorTest() {
+        try {
+            final String expectedSQL = "delete from playlisttracks where playlistid = ?";
+            int expectedPlaylistId = 1;
+
+            when(dataSource.getConnection()).thenReturn(connection);
+            when(connection.prepareStatement(expectedSQL)).thenReturn(preparedStatement);
+            when(preparedStatement.executeUpdate()).thenThrow(new SQLException());
+
+            assertThrows(InternalServerError.class, () -> {
+                mockPlaylistDAO.deleteTracksInPlaylist(expectedPlaylistId);
+            });
+        } catch (Exception e) {
+            e.getMessage();
+        }
+    }
+
+    /**
+     * deleteTrackInPlaylist()
+     * */
+    @Test
     public void deleteTrackInPlaylistTest() {
         try {
             final String expectedSQL = "delete from playlisttracks where playlistid = ? and trackid = ?";
@@ -360,6 +624,25 @@ public class PlaylistDAOTest {
             assertTrue(deleteTrackInPlaylist);
         } catch (Exception e) {
             fail(e);
+            e.getMessage();
+        }
+    }
+
+    @Test
+    public void deleteTrackInPlaylistTrowsErrorTest() {
+        try {
+            final String expectedSQL = "delete from playlisttracks where playlistid = ? and trackid = ?";
+            int expectedPlaylistId = 1;
+            int expectedTrackId = 2;
+
+            when(dataSource.getConnection()).thenReturn(connection);
+            when(connection.prepareStatement(expectedSQL)).thenReturn(preparedStatement);
+            when(preparedStatement.executeUpdate()).thenThrow(new SQLException());
+
+            assertThrows(InternalServerError.class, () -> {
+                mockPlaylistDAO.deleteTrackInPlaylist(expectedPlaylistId, expectedTrackId);
+            });
+        } catch (Exception e) {
             e.getMessage();
         }
     }

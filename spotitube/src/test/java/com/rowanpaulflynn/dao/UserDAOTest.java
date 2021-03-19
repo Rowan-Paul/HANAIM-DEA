@@ -1,10 +1,8 @@
 package com.rowanpaulflynn.dao;
 
-import com.rowanpaulflynn.dao.UserDAO;
 import com.rowanpaulflynn.domain.Token;
 import com.rowanpaulflynn.domain.User;
 import com.rowanpaulflynn.exceptions.AccessDeniedError;
-import com.rowanpaulflynn.exceptions.InternalServerError;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,6 +33,9 @@ public class UserDAOTest {
         userDAO.setDataSource(dataSource);
     }
 
+    /**
+     * getUser()
+     * */
     @Test
     public void getUserTest() {
         try {
@@ -65,7 +66,36 @@ public class UserDAOTest {
     }
 
     @Test
-    public void getUserThrowsErrorTest() throws AccessDeniedError {
+    public void getUserFailedTest() {
+        try {
+            // Arrange
+            final String expectedSQL = "select * from users where user = ?";
+            final String username = "rowan";
+
+            // instruct mocks
+            when(dataSource.getConnection()).thenReturn(connection);
+            when(connection.prepareStatement(expectedSQL)).thenReturn(preparedStatement);
+            when(preparedStatement.executeQuery()).thenReturn(resultSet);
+            when(resultSet.next()).thenReturn(false);
+
+            when(resultSet.getString("user")).thenReturn(username);
+
+            // Act
+            User user = userDAO.getUser(username);
+
+            // Assert
+            verify(connection).prepareStatement(expectedSQL);
+            verify(preparedStatement).setString(1, username);
+
+            assertEquals(null, user);
+        } catch (Exception e) {
+            fail(e);
+            e.getMessage();
+        }
+    }
+
+    @Test
+    public void getUserTrowsErrorTest() {
         try {
             final String expectedSQL = "select * from users where user = ?";
             final String username = "rowan";
@@ -83,6 +113,9 @@ public class UserDAOTest {
         }
     }
 
+    /**
+     * createToken()
+     * */
     @Test
     public void createTokenTest() {
         try {
@@ -94,7 +127,6 @@ public class UserDAOTest {
             when(dataSource.getConnection()).thenReturn(connection);
             when(connection.prepareStatement(expectedSQL)).thenReturn(preparedStatement);
             when(preparedStatement.executeUpdate()).thenReturn(1);
-            when(resultSet.next()).thenReturn(true).thenReturn(false);
 
             // Act
             Token token = userDAO.createToken(username);
@@ -111,6 +143,27 @@ public class UserDAOTest {
         }
     }
 
+    @Test
+    public void createTokenTrowsErrorTest() {
+        try {
+            final String expectedSQL = "insert into tokens (`token`, `user`) values (?, ?)";
+            final String username = "rowan";
+
+            when(dataSource.getConnection()).thenReturn(connection);
+            when(connection.prepareStatement(expectedSQL)).thenReturn(preparedStatement);
+            when(preparedStatement.executeUpdate()).thenThrow(new SQLException());
+
+            assertThrows(AccessDeniedError.class, () -> {
+                userDAO.createToken(username);
+            });
+        } catch (Exception e) {
+            e.getMessage();
+        }
+    }
+
+    /**
+     * verifyToken()
+     * */
     @Test
     public void verifyTokenTest() {
         try {
@@ -137,6 +190,54 @@ public class UserDAOTest {
             assertEquals(username, user.getUser());
         } catch (Exception e) {
             fail(e);
+            e.getMessage();
+        }
+    }
+    @Test
+    public void verifyTokenFailedTest() {
+        try {
+            // Arrange
+            final String expectedSQL = "select * from tokens where token = ?";
+            final String username = "rowan";
+            final String expectedToken = "abb94ad7-1e79-43a7-a726-dc014e202351";
+
+            // instruct mocks
+            when(dataSource.getConnection()).thenReturn(connection);
+            when(connection.prepareStatement(expectedSQL)).thenReturn(preparedStatement);
+            when(preparedStatement.executeQuery()).thenReturn(resultSet);
+            when(resultSet.next()).thenReturn(false);
+
+            when(resultSet.getString("user")).thenReturn(username);
+
+            // Act
+            User user = userDAO.verifyToken(expectedToken);
+
+            // Assert
+            verify(connection).prepareStatement(expectedSQL);
+            verify(preparedStatement).setString(1, expectedToken);
+
+            assertEquals(null, user);
+        } catch (Exception e) {
+            fail(e);
+            e.getMessage();
+        }
+    }
+
+    @Test
+    public void verifyTokenTrowsErrorTest() {
+        try {
+            final String expectedSQL = "select * from tokens where token = ?";
+            final String expectedToken = "abb94ad7-1e79-43a7-a726-dc014e202351";
+
+            when(dataSource.getConnection()).thenReturn(connection);
+            when(connection.prepareStatement(expectedSQL)).thenReturn(preparedStatement);
+            when(preparedStatement.executeQuery()).thenReturn(resultSet);
+            when(resultSet.next()).thenThrow(new SQLException());
+
+            assertThrows(AccessDeniedError.class, () -> {
+                userDAO.verifyToken(expectedToken);
+            });
+        } catch (Exception e) {
             e.getMessage();
         }
     }

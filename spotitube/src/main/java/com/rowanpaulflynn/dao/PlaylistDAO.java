@@ -181,7 +181,6 @@ public class PlaylistDAO implements IPlaylistDAO {
             int resultSet = statement.executeUpdate();
 
             return true;
-
         } catch (SQLException exception) {
             throw new InternalServerError(exception.toString());
         }
