@@ -6,6 +6,7 @@ import com.rowanpaulflynn.dao.IUserDAO;
 import com.rowanpaulflynn.domain.Token;
 import com.rowanpaulflynn.domain.Track;
 import com.rowanpaulflynn.domain.User;
+import com.rowanpaulflynn.service.dto.TracklistDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -18,8 +19,6 @@ import static org.mockito.Mockito.*;
 
 public class TrackServiceTest {
     private TrackService trackService;
-    private PlaylistService playlistService;
-    private UserService userService;
     ITrackDAO trackDAOMock = mock(ITrackDAO.class);
     IUserDAO userDAOMock = mock(IUserDAO.class);
     IPlaylistDAO playlistDAOMock = mock(IPlaylistDAO.class);
@@ -28,8 +27,16 @@ public class TrackServiceTest {
 
     ArrayList<Track> playlist1 = new ArrayList<>();
     ArrayList<Track> playlist2 = new ArrayList<>();
+    ArrayList<Track> playlist3 = new ArrayList<>();
     
-    public void setup() {
+    @BeforeEach
+    public void beforeEachSetUp() {
+        trackService = new TrackService();
+        trackService.setTrackDAO(trackDAOMock);
+        trackService.setUserDAO(userDAOMock);
+        trackService.setPlaylistDAO(playlistDAOMock);
+
+
         Track tk1 = new Track(1,"the 1","Taylor Swift");
         tk1.setAlbum("folklore");
         tk1.setDuration(200);
@@ -47,19 +54,31 @@ public class TrackServiceTest {
         tk2.setPublicationDate("05-22-2020");
         tk2.setDescription("Other cool song");
         tk2.setOfflineAvailable(false);
-        playlist1.add(tk1);
-    }
-    
-    @BeforeEach
-    public void beforeEachSetUp() {
-        trackService = new TrackService();
-        playlistService = new PlaylistService();
-        userService = new UserService();
+        playlist1.add(tk2);
+        playlist3.add(tk2);
     }
 
     @Test
     public void getTracksTest() {
         int expectedStatuscode = 200;
+        int expectedPlaylistId = 1;
+        TracklistDTO expectedTracklist = new TracklistDTO();
+        expectedTracklist.tracks = playlist3;
+
+        doReturn(playlist2).when(playlistDAOMock).getTracksFromPlaylist(expectedPlaylistId);
+        doReturn(playlist1).when(trackDAOMock).getTracks();
+        when(userDAOMock.verifyToken(token.getToken())).thenReturn(user);
+
+        Response response = trackService.getTracks(token.getToken(), expectedPlaylistId);
+        TracklistDTO responseTracklist = (TracklistDTO) response.getEntity();
+
+        assertEquals(expectedStatuscode, response.getStatus());
+        assertEquals(expectedTracklist.tracks.size(), responseTracklist.tracks.size());
+    }
+
+    @Test
+    public void getTracksTokenNullTest() {
+        int expectedStatuscode = 400;
         int expectedPlaylistId = 1;
 
         doReturn(playlist2).when(playlistDAOMock).getTracksFromPlaylist(expectedPlaylistId);
@@ -70,9 +89,8 @@ public class TrackServiceTest {
         trackService.setUserDAO(userDAOMock);
         trackService.setPlaylistDAO(playlistDAOMock);
 
-        Response response = trackService.getTracks(token.getToken(), expectedPlaylistId);
+        Response response = trackService.getTracks(null, expectedPlaylistId);
 
         assertEquals(expectedStatuscode, response.getStatus());
-        assertEquals(playlist2, response.getEntity());
     }
 }
