@@ -202,7 +202,6 @@ public class PlaylistService {
         if (tracklistDTO.tracks.size() > 0) {
             return Response.status(200).entity(tracklistDTO).build();
         }
-
         return Response.status(404).build();
     }
 
