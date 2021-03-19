@@ -3,6 +3,8 @@ package com.rowanpaulflynn.dao;
 import com.rowanpaulflynn.dao.UserDAO;
 import com.rowanpaulflynn.domain.Token;
 import com.rowanpaulflynn.domain.User;
+import com.rowanpaulflynn.exceptions.AccessDeniedError;
+import com.rowanpaulflynn.exceptions.InternalServerError;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -10,6 +12,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -57,6 +60,25 @@ public class UserDAOTest {
             assertEquals(username, user.getUser());
         } catch (Exception e) {
             fail(e);
+            e.getMessage();
+        }
+    }
+
+    @Test
+    public void getUserThrowsErrorTest() throws AccessDeniedError {
+        try {
+            final String expectedSQL = "select * from users where user = ?";
+            final String username = "rowan";
+
+            when(dataSource.getConnection()).thenReturn(connection);
+            when(connection.prepareStatement(expectedSQL)).thenReturn(preparedStatement);
+            when(preparedStatement.executeQuery()).thenReturn(resultSet);
+            when(resultSet.next()).thenThrow(new SQLException());
+
+            assertThrows(AccessDeniedError.class, () -> {
+                userDAO.getUser(username);
+            });
+        } catch (Exception e) {
             e.getMessage();
         }
     }

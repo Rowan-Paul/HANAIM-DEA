@@ -2,6 +2,7 @@ package com.rowanpaulflynn.dao;
 
 import com.rowanpaulflynn.domain.Token;
 import com.rowanpaulflynn.domain.User;
+import com.rowanpaulflynn.exceptions.AccessDeniedError;
 
 import javax.annotation.Resource;
 import javax.enterprise.inject.Default;
@@ -17,7 +18,7 @@ public class UserDAO implements IUserDAO {
     DataSource dataSource;
 
     @Override
-    public User getUser(String inputUser) {
+    public User getUser(String inputUser) throws AccessDeniedError {
         String sql = "select * from users where user = ?";
 
         try(Connection connection = dataSource.getConnection();) {
@@ -33,11 +34,10 @@ public class UserDAO implements IUserDAO {
                 return user;
             }
 
+            return null;
         } catch (SQLException exception) {
-            exception.printStackTrace();
+            throw new AccessDeniedError(exception.toString());
         }
-
-        return null;
     }
 
     @Override
@@ -55,10 +55,8 @@ public class UserDAO implements IUserDAO {
             return token;
 
         } catch (SQLException exception) {
-            exception.printStackTrace();
+            throw new AccessDeniedError(exception.toString());
         }
-
-        return null;
     }
 
     @Override
@@ -76,11 +74,10 @@ public class UserDAO implements IUserDAO {
                 return user;
             }
 
+            return null;
         } catch (SQLException exception) {
-            exception.printStackTrace();
+            throw new AccessDeniedError(exception.toString());
         }
-
-        return new User("null");
     }
 
     public void setDataSource(DataSource dataSource) {

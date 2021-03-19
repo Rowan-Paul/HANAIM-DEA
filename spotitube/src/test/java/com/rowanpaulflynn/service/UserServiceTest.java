@@ -3,7 +3,6 @@ package com.rowanpaulflynn.service;
 import com.rowanpaulflynn.dao.IUserDAO;
 import com.rowanpaulflynn.domain.Token;
 import com.rowanpaulflynn.domain.User;
-import com.rowanpaulflynn.service.UserService;
 import com.rowanpaulflynn.service.dto.TokenDTO;
 import com.rowanpaulflynn.service.dto.UserDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,13 +22,8 @@ public class UserServiceTest {
         userService = new UserService();
     }
 
-    /**
-     * Happy path
-     * POST /login
-     * */
     @Test
     public void loginUserTest() {
-        // Arrange
         int statuscodeExpected = 201;
         final String username = "rowan";
         User user = new User(username);
@@ -44,27 +38,19 @@ public class UserServiceTest {
         userDTO.user = user.getUser();
         userDTO.password = user.getPassword();
 
-
         IUserDAO userDAOMock = mock(IUserDAO.class);
         when(userDAOMock.getUser(user.getUser())).thenReturn(returnedUser);
         when(userDAOMock.createToken(user.getUser())).thenReturn(token);
         userService.setUserDAO(userDAOMock);
 
-        // Act
         Response response = userService.loginUser(userDTO);
         TokenDTO tokenDTO = (TokenDTO) response.getEntity();
-        
-        // Assert
+
         assertEquals(statuscodeExpected, response.getStatus());
         assertEquals(username,tokenDTO.user);
         assertEquals(token.getToken(), tokenDTO.token);
     }
 
-
-    /**
-     * Unhappy path - user has the wrong password
-     * POST /login
-     * */
     @Test
     public void loginUserFailedTest() {
         // Arrange

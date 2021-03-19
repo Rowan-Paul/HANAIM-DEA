@@ -1,6 +1,7 @@
 package com.rowanpaulflynn.dao;
 
 import com.rowanpaulflynn.domain.Track;
+import com.rowanpaulflynn.exceptions.InternalServerError;
 
 import javax.annotation.Resource;
 import javax.enterprise.inject.Default;
@@ -18,7 +19,7 @@ public class TrackDAO implements ITrackDAO {
     DataSource dataSource;
 
     @Override
-    public ArrayList<Track> getTracks() {
+    public ArrayList<Track> getTracks() throws InternalServerError  {
         String sql = "select * from tracks";
 
         try(Connection connection = dataSource.getConnection();) {
@@ -44,10 +45,8 @@ public class TrackDAO implements ITrackDAO {
             return tracks;
 
         } catch (SQLException exception) {
-            exception.printStackTrace();
+            throw new InternalServerError(exception.toString());
         }
-
-        return null;
     }
 
     public void setDataSource(DataSource dataSource) {

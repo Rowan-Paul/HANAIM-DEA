@@ -96,7 +96,6 @@ public class PlaylistDAOTest {
             assertThrows(InternalServerError.class, () -> {
                 mockPlaylistDAO.getPlaylists();
             });
-
         } catch (Exception e) {
             e.getMessage();
         }
