@@ -36,14 +36,19 @@ public class TrackService {
         ArrayList<Track> inPlaylist = playlistDAO.getTracksFromPlaylist(playlistid);
         ArrayList<Track> allTracks = trackDAO.getTracks();
 
-        if (playlistid > 0 && inPlaylist.size() > 0) {
+        if (inPlaylist.size() > 0) {
             ArrayList<Track> tracks = new ArrayList<>();
+            ArrayList<Integer> playlistTrackIDs = new ArrayList<>();
 
-            allTracks.forEach((track) -> inPlaylist.forEach((playlistTrack) -> {
-                if (playlistTrack.getId() != track.getId()) {
-                    tracks.add(playlistDAO.getTrackInfo(track.getId()));
+            for (Track track : inPlaylist) {
+                playlistTrackIDs.add(track.getId());
+            }
+
+            for (Track track : allTracks) {
+                if(!playlistTrackIDs.contains(track.getId())) {
+                    tracks.add(track);
                 }
-            }));
+            }
 
             TracklistDTO tracklistDTO = new TracklistDTO();
             tracklistDTO.tracks = tracks;

@@ -155,7 +155,6 @@ public class PlaylistService {
         if (playlistDAO.deleteTrackInPlaylist(playlistid, trackid)) {
             ArrayList<Track> tracks = playlistDAO.getTracksFromPlaylist(playlistid);
 
-            //TODO: fix deleting last track giving 400
             return Response.status(200).entity(tracks).build();
         }
         return Response.status(400).build();

@@ -13,8 +13,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-//TODO: move certain track related functions to TrackDAO
-//TODO: add offlineAvailable or something
 @Default
 public class PlaylistDAO implements IPlaylistDAO {
     @Resource(name = "jdbc/spotitube")
@@ -113,7 +111,7 @@ public class PlaylistDAO implements IPlaylistDAO {
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, playlistid);
-            int resultSet = statement.executeUpdate();
+            statement.executeUpdate();
 
             if(deleteTracksInPlaylist(playlistid)){
                 return true;
@@ -178,7 +176,7 @@ public class PlaylistDAO implements IPlaylistDAO {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, playlistid);
             statement.setInt(2, trackid);
-            int resultSet = statement.executeUpdate();
+            statement.executeUpdate();
 
             return true;
         } catch (SQLException exception) {
@@ -194,7 +192,7 @@ public class PlaylistDAO implements IPlaylistDAO {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, playlist.getName());
             statement.setInt(2, playlistid);
-            int resultSet = statement.executeUpdate();
+            statement.executeUpdate();
 
             if(playlist.getTracks().size() > 0) {
                 deleteTracksInPlaylist(playlistid);
@@ -217,7 +215,7 @@ public class PlaylistDAO implements IPlaylistDAO {
         try (Connection connection = dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, playlistid);
-            int resultSet = statement.executeUpdate();
+            statement.executeUpdate();
 
             return true;
 
@@ -234,10 +232,9 @@ public class PlaylistDAO implements IPlaylistDAO {
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, playlistid);
             statement.setInt(2, trackid);
-            int resultSet = statement.executeUpdate();
+            statement.executeUpdate();
 
             return true;
-
         } catch (SQLException exception) {
             throw new InternalServerError(exception.toString());
         }

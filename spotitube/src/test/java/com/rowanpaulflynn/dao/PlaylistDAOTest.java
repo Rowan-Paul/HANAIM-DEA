@@ -477,7 +477,6 @@ public class PlaylistDAOTest {
         }
     }
 
-    //TODO: get it to show up on line coverage
     @Test
     public void addTrackToPlaylistTrowsErrorTest() {
         try {
