@@ -161,7 +161,7 @@ public class PlaylistServiceTest {
         int expectedStatusCode = 200;
 
         when(userDAOMock.verifyToken(token.getToken())).thenReturn(user);
-        when(playlistDAOMock.createPlaylist(any(Playlist.class),any(String.class))).thenReturn(true);
+        when(playlistDAOMock.createPlaylist(any(Playlist.class),eq(user.getUser()))).thenReturn(true);
         doReturn(expectedPlaylistsDTO).when(mockPlaylistService).getAllPlaylistsList(user);
 
         Response response = mockPlaylistService.createPlaylist(playlistDTO,token.getToken());
@@ -212,7 +212,7 @@ public class PlaylistServiceTest {
         int playlistid = 1;
 
         when(userDAOMock.verifyToken(token.getToken())).thenReturn(user);
-        when(playlistDAOMock.editPlaylist(any(int.class), any(Playlist.class))).thenReturn(true);
+        when(playlistDAOMock.editPlaylist(eq(playlistid), any(Playlist.class))).thenReturn(true);
         doReturn(expectedPlaylistsDTO).when(mockPlaylistService).getAllPlaylistsList(user);
 
         Response response = mockPlaylistService.editPlaylistTracks(playlistid, playlistDTO, token.getToken());
