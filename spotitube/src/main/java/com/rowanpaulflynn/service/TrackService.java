@@ -54,7 +54,9 @@ public class TrackService {
             tracklistDTO.tracks = tracks;
             return Response.status(200).entity(tracklistDTO).build();
         } else {
-            return Response.status(200).entity(allTracks).build();
+            TracklistDTO tracklistDTO = new TracklistDTO();
+            tracklistDTO.tracks = allTracks;
+            return Response.status(200).entity(tracklistDTO).build();
         }
     }
 

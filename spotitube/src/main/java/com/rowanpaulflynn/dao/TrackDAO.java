@@ -25,7 +25,6 @@ public class TrackDAO implements ITrackDAO {
         try(Connection connection = dataSource.getConnection();) {
             PreparedStatement statement = connection.prepareStatement(sql);
             ResultSet resultSet = statement.executeQuery();
-
             ArrayList<Track> tracks = new ArrayList<Track>();
 
             while (resultSet.next()){
@@ -43,7 +42,6 @@ public class TrackDAO implements ITrackDAO {
             }
 
             return tracks;
-
         } catch (SQLException exception) {
             throw new InternalServerError(exception.toString());
         }
