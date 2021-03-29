@@ -19,7 +19,6 @@ import javax.ws.rs.core.Response;
 
 @Path("/login")
 public class UserService {
-
     private IUserDAO userDAO;
 
     @POST
@@ -56,7 +55,7 @@ public class UserService {
     }
 
     @Inject
-    public void setUserDAO(IUserDAO userDAO) {
-        this.userDAO = userDAO;
+    public void setUserDAO(IUserDAO userDAOMongo) {
+        this.userDAO = userDAOMongo;
     }
 }

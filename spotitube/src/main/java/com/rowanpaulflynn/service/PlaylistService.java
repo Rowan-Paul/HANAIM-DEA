@@ -210,7 +210,7 @@ public class PlaylistService {
     }
 
     @Inject
-    public void setUserDAO(IUserDAO userDAO) {
-        this.userDAO = userDAO;
+    public void setUserDAO(IUserDAO userDAOMongo) {
+        this.userDAO = userDAOMongo;
     }
 }
